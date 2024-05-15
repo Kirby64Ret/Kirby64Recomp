@@ -42,6 +42,7 @@ add_library(RecompiledFuncs STATIC)
 
 target_compile_options(RecompiledFuncs PRIVATE
     # -Wno-unused-but-set-variable
+    -Wno-implicit-function-declaration
     -fno-strict-aliasing
 )
 
@@ -55,36 +56,36 @@ file(GLOB FUNC_CXX_SOURCES ${CMAKE_SOURCE_DIR}/RecompiledFuncs/*.cpp)
 target_sources(RecompiledFuncs PRIVATE ${FUNC_C_SOURCES} ${FUNC_CXX_SOURCES})
 
 # PatchesLib - Library containing the recompiled output for any custom function patches
-add_library(PatchesLib STATIC)
+# add_library(PatchesLib STATIC)
 
-target_compile_options(PatchesLib PRIVATE
-    # -Wno-unused-but-set-variable
-    -fno-strict-aliasing
-)
+# target_compile_options(PatchesLib PRIVATE
+#     # -Wno-unused-but-set-variable
+#     -fno-strict-aliasing
+# )
 
-target_include_directories(PatchesLib PRIVATE
-    ${CMAKE_SOURCE_DIR}/include
-)
+# target_include_directories(PatchesLib PRIVATE
+#     ${CMAKE_SOURCE_DIR}/include
+# )
 
-target_sources(PatchesLib PRIVATE
-    ${CMAKE_SOURCE_DIR}/RecompiledPatches/patches.c
-    ${CMAKE_SOURCE_DIR}/RecompiledPatches/patches_bin.c
-)
+# target_sources(PatchesLib PRIVATE
+#     ${CMAKE_SOURCE_DIR}/RecompiledPatches/patches.c
+#     ${CMAKE_SOURCE_DIR}/RecompiledPatches/patches_bin.c
+# )
 
-set_source_files_properties(${CMAKE_SOURCE_DIR}/RecompiledPatches/patches.c PROPERTIES COMPILE_FLAGS -fno-strict-aliasing)
+# set_source_files_properties(${CMAKE_SOURCE_DIR}/RecompiledPatches/patches.c PROPERTIES COMPILE_FLAGS -fno-strict-aliasing)
 
-# Build patches elf
-add_custom_command(OUTPUT ${CMAKE_SOURCE_DIR}/patches/patches.bin
-    COMMAND make
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/patches
-    BYPRODUCTS ${CMAKE_SOURCE_DIR}/patches/patches.bin}
-)
+# # Build patches elf
+# add_custom_command(OUTPUT ${CMAKE_SOURCE_DIR}/patches/patches.bin
+#     COMMAND make
+#     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/patches
+#     BYPRODUCTS ${CMAKE_SOURCE_DIR}/patches/patches.bin}
+# )
 
-# Generate patches_bin.c from patches.bin
-add_custom_command(OUTPUT ${CMAKE_SOURCE_DIR}/RecompiledPatches/patches_bin.c
-    COMMAND file_to_c ${CMAKE_SOURCE_DIR}/patches/patches.bin mm_patches_bin ${CMAKE_SOURCE_DIR}/RecompiledPatches/patches_bin.c ${CMAKE_SOURCE_DIR}/RecompiledPatches/patches_bin.h 
-    DEPENDS ${CMAKE_SOURCE_DIR}/patches/patches.bin
-)
+# # Generate patches_bin.c from patches.bin
+# add_custom_command(OUTPUT ${CMAKE_SOURCE_DIR}/RecompiledPatches/patches_bin.c
+#     COMMAND file_to_c ${CMAKE_SOURCE_DIR}/patches/patches.bin mm_patches_bin ${CMAKE_SOURCE_DIR}/RecompiledPatches/patches_bin.c ${CMAKE_SOURCE_DIR}/RecompiledPatches/patches_bin.h 
+#     DEPENDS ${CMAKE_SOURCE_DIR}/patches/patches.bin
+# )
 
 # Generate mm_shader_cache.c from the MM shader cache
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mm_shader_cache.c ${CMAKE_CURRENT_BINARY_DIR}/mm_shader_cache.h
@@ -92,16 +93,16 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mm_shader_cache.c ${CMAKE_
     DEPENDS ${CMAKE_SOURCE_DIR}/shadercache/mm_shader_cache.bin
 )
 
-# Recompile patches elf into patches.c
-add_custom_command(OUTPUT
-                       ${CMAKE_SOURCE_DIR}/RecompiledPatches/patches.c
-                       ${CMAKE_SOURCE_DIR}/RecompiledPatches/recomp_overlays.inl
-                       ${CMAKE_SOURCE_DIR}/RecompiledPatches/funcs.h
-                       ${CMAKE_SOURCE_DIR}/src/recomp/patch_loading.cpp
-                   COMMAND ./N64Recomp patches.toml && ${CMAKE_COMMAND} -E touch ${CMAKE_SOURCE_DIR}/src/recomp/patch_loading.cpp
-                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                   DEPENDS ${CMAKE_SOURCE_DIR}/patches/patches.bin
-)
+# # Recompile patches elf into patches.c
+# add_custom_command(OUTPUT
+#                        ${CMAKE_SOURCE_DIR}/RecompiledPatches/patches.c
+#                        ${CMAKE_SOURCE_DIR}/RecompiledPatches/recomp_overlays.inl
+#                        ${CMAKE_SOURCE_DIR}/RecompiledPatches/funcs.h
+#                        ${CMAKE_SOURCE_DIR}/src/recomp/patch_loading.cpp
+#                    COMMAND ./N64Recomp patches.toml && ${CMAKE_COMMAND} -E touch ${CMAKE_SOURCE_DIR}/src/recomp/patch_loading.cpp
+#                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+#                    DEPENDS ${CMAKE_SOURCE_DIR}/patches/patches.bin
+# )
 
 # Main executable
 add_executable(Kirby64Recompiled)
@@ -262,7 +263,6 @@ if (LINUX)
 endif()
 
 target_link_libraries(Kirby64Recompiled PRIVATE
-    PatchesLib
     RecompiledFuncs
     SDL2
     rt64
