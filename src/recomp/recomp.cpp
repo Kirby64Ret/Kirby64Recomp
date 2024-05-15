@@ -375,7 +375,7 @@ void ultramodern::quit() {
 
 void recomp::start(ultramodern::WindowHandle window_handle, const ultramodern::audio_callbacks_t& audio_callbacks, const ultramodern::input_callbacks_t& input_callbacks, const ultramodern::gfx_callbacks_t& gfx_callbacks_) {
     recomp::check_all_stored_roms();
-    set_audio_callbacks(audio_callbacks);
+    // set_audio_callbacks(audio_callbacks);
     set_input_callbacks(input_callbacks);
 
     ultramodern::gfx_callbacks_t gfx_callbacks = gfx_callbacks_;
