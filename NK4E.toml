@@ -1,0 +1,28 @@
+# Config file for Kirby 64 Recompilation.
+
+[input]
+entrypoint_name = "EntryPoint"
+entrypoint = 0x80000400
+# Paths are relative to the location of this config file.
+elf_path = "NK4E.us.elf"
+output_func_path = "RecompiledFuncs"
+relocatable_sections_path = "NK4E.overlays.txt"
+
+# remove imem/dmem checks
+[[patches.instruction]]
+func = "thread5_game"
+vram = 0x8000063C
+value = 0x00000000 # j -> nop
+[[patches.instruction]]
+func = "thread5_game"
+vram = 0x80000644
+value = 0x00000000 # j -> nop
+
+[[patches.func]]
+name = "recomp_ovl_load_hook"
+args = ["u32", "u32", "u32"]
+
+[[patches.hook]]
+func = "dma_overlay_load"
+text = "    recomp_ovl_load_hook(MEM_W(0, ctx->r4), MEM_W(0x8, ctx->r4), (uint32_t)(MEM_W(0x24, ctx->r4) - MEM_W(0x8, ctx->r4)));"
+# No after_vram means this will be placed at the start of the function

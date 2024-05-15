@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(Zelda64Recompiled)
+project(Kirby64Recompiled)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -104,7 +104,7 @@ add_custom_command(OUTPUT
 )
 
 # Main executable
-add_executable(Zelda64Recompiled)
+add_executable(Kirby64Recompiled)
 
 set (SOURCES
     ${CMAKE_SOURCE_DIR}/ultramodern/audio.cpp
@@ -154,15 +154,14 @@ set (SOURCES
     ${CMAKE_SOURCE_DIR}/src/ui/ui_color_hack.cpp
     ${CMAKE_SOURCE_DIR}/src/ui/ui_rml_hacks.cpp
 
-    ${CMAKE_SOURCE_DIR}/rsp/aspMain.cpp
-    ${CMAKE_SOURCE_DIR}/rsp/njpgdspMain.cpp
+    ${CMAKE_SOURCE_DIR}/rsp/n_aspMain.cpp
 
     ${CMAKE_SOURCE_DIR}/lib/RmlUi/Backends/RmlUi_Platform_SDL.cpp
 
-    ${CMAKE_CURRENT_BINARY_DIR}/mm_shader_cache.c
+    # ${CMAKE_CURRENT_BINARY_DIR}/mm_shader_cache.c
 )
 
-target_include_directories(Zelda64Recompiled PRIVATE
+target_include_directories(Kirby64Recompiled PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/lib/concurrentqueue
     ${CMAKE_SOURCE_DIR}/lib/GamepadMotionHelpers
@@ -180,7 +179,7 @@ target_include_directories(Zelda64Recompiled PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-target_compile_options(Zelda64Recompiled PRIVATE
+target_compile_options(Kirby64Recompiled PRIVATE
     -march=nehalem
     -fno-strict-aliasing
     -fms-extensions
@@ -195,23 +194,23 @@ if (WIN32)
         URL_HASH MD5=d8173db078e54040c666f411c5a6afff
     )
     FetchContent_MakeAvailable(sdl2)
-    target_include_directories(Zelda64Recompiled PRIVATE
+    target_include_directories(Kirby64Recompiled PRIVATE
         ${sdl2_SOURCE_DIR}/include
     )
-    target_link_directories(Zelda64Recompiled PRIVATE
+    target_link_directories(Kirby64Recompiled PRIVATE
         ${sdl2_SOURCE_DIR}/lib/x64
     )
 
     # Copy SDL2 and dxc DLLs to output folder as post build step
-    add_custom_command(TARGET Zelda64Recompiled POST_BUILD
+    add_custom_command(TARGET Kirby64Recompiled POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${sdl2_SOURCE_DIR}/lib/x64/SDL2.dll"
             "${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/x64/dxil.dll"
             "${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/x64/dxcompiler.dll"
-            $<TARGET_FILE_DIR:Zelda64Recompiled>)
+            $<TARGET_FILE_DIR:Kirby64Recompiled>)
             
     set_target_properties(
-        Zelda64Recompiled
+        Kirby64Recompiled
         PROPERTIES
             LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE"
             LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup"
@@ -219,7 +218,7 @@ if (WIN32)
             LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup"
     )
 
-    target_sources(Zelda64Recompiled PRIVATE ${CMAKE_SOURCE_DIR}/icons/app.rc)
+    target_sources(Kirby64Recompiled PRIVATE ${CMAKE_SOURCE_DIR}/icons/app.rc)
 endif()
 
 if (LINUX)
@@ -231,20 +230,20 @@ if (LINUX)
         COMMAND file_to_c ${CMAKE_SOURCE_DIR}/icons/512.png icon_bytes ${CMAKE_CURRENT_BINARY_DIR}/icon_bytes.c ${CMAKE_CURRENT_BINARY_DIR}/icon_bytes.h 
         DEPENDS ${CMAKE_SOURCE_DIR}/icons/512.png
     )
-    target_sources(Zelda64Recompiled PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/icon_bytes.c)
+    target_sources(Kirby64Recompiled PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/icon_bytes.c)
 
     message(STATUS "SDL2_FOUND = ${SDL2_FOUND}")
     message(STATUS "SDL2_INCLUDE_DIRS = ${SDL2_INCLUDE_DIRS}")
 
-    target_include_directories(Zelda64Recompiled PRIVATE ${SDL2_INCLUDE_DIRS})
+    target_include_directories(Kirby64Recompiled PRIVATE ${SDL2_INCLUDE_DIRS})
 
     message(STATUS "X11_FOUND = ${X11_FOUND}")
     message(STATUS "X11_Xrandr_FOUND = ${X11_Xrandr_FOUND}")
     message(STATUS "X11_INCLUDE_DIR = ${X11_INCLUDE_DIR}")
     message(STATUS "X11_LIBRARIES = ${X11_LIBRARIES}")
 
-    target_include_directories(Zelda64Recompiled PRIVATE ${X11_INCLUDE_DIR} ${X11_Xrandr_INCLUDE_PATH})
-    target_link_libraries(Zelda64Recompiled PRIVATE ${X11_LIBRARIES} ${X11_Xrandr_LIB})
+    target_include_directories(Kirby64Recompiled PRIVATE ${X11_INCLUDE_DIR} ${X11_Xrandr_INCLUDE_PATH})
+    target_link_libraries(Kirby64Recompiled PRIVATE ${X11_LIBRARIES} ${X11_Xrandr_LIB})
 
     find_package(Freetype REQUIRED)
 
@@ -253,16 +252,16 @@ if (LINUX)
     message(STATUS "FREETYPE_LIBRARIES = ${FREETYPE_LIBRARIES}")
 
     include_directories(${FREETYPE_LIBRARIES})
-    target_link_libraries(Zelda64Recompiled PRIVATE ${FREETYPE_LIBRARIES})
+    target_link_libraries(Kirby64Recompiled PRIVATE ${FREETYPE_LIBRARIES})
 
     set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
     set(THREADS_PREFER_PTHREAD_FLAG TRUE)
     find_package(Threads REQUIRED)
     
-    target_link_libraries(Zelda64Recompiled PRIVATE "-latomic -static-libstdc++" ${CMAKE_DL_LIBS} Threads::Threads)
+    target_link_libraries(Kirby64Recompiled PRIVATE "-latomic -static-libstdc++" ${CMAKE_DL_LIBS} Threads::Threads)
 endif()
 
-target_link_libraries(Zelda64Recompiled PRIVATE
+target_link_libraries(Kirby64Recompiled PRIVATE
     PatchesLib
     RecompiledFuncs
     SDL2
@@ -291,10 +290,10 @@ else()
     set (DXC "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/lib/rt64/src/contrib/dxc/lib/x64" "${PROJECT_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/x64/dxc")
 endif()
 
-build_vertex_shader(Zelda64Recompiled "shaders/InterfaceVS.hlsl" "shaders/InterfaceVS.hlsl")
-build_pixel_shader (Zelda64Recompiled "shaders/InterfacePS.hlsl" "shaders/InterfacePS.hlsl")
+build_vertex_shader(Kirby64Recompiled "shaders/InterfaceVS.hlsl" "shaders/InterfaceVS.hlsl")
+build_pixel_shader (Kirby64Recompiled "shaders/InterfacePS.hlsl" "shaders/InterfacePS.hlsl")
 
-target_sources(Zelda64Recompiled PRIVATE ${SOURCES})
+target_sources(Kirby64Recompiled PRIVATE ${SOURCES})
 
-set_property(TARGET Zelda64Recompiled PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+set_property(TARGET Kirby64Recompiled PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 

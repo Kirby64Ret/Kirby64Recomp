@@ -1,0 +1,24 @@
+text_offset = 0x39E30
+text_size = 0xC60
+text_address = 0x04001000
+rom_file_path = "NK4E.z64"
+output_file_path = "rsp/n_aspMain.cpp"
+output_function_name = "n_aspMain"
+extra_indirect_branch_targets = [
+    0x1120,
+    0x10BC,
+    0x114C,
+    0x10EC,
+    0x1174,
+    0x1484,
+    0x177C,
+    0x187C,
+    0x193C,
+    0x1B2C,
+    0x1B60,
+    0x1BD0,
+    0x1BE4,
+    0x1BB0
+]
+
+
