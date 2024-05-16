@@ -11,7 +11,6 @@
 namespace recomp {
 	enum class Game {
 		MM,
-		DKR,
 		K64,
 		None,
 		Quit

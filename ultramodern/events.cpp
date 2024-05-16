@@ -200,6 +200,7 @@ uint16_t rspInverseSquareRoots[512];
 using RspUcodeFunc = RspExitReason(uint8_t* rdram);
 // extern RspUcodeFunc njpgdspMain;
 extern RspUcodeFunc n_aspMain;
+extern RspUcodeFunc aspMain;
 
 // From Ares emulator. For license details, see rsp_vu.h
 void rsp_constants_init() {
@@ -251,6 +252,7 @@ void task_thread_func(uint8_t* rdram, moodycamel::LightweightSemaphore* thread_r
         // Run the correct function based on the task type
         if (task->t.type == M_AUDTASK) {
             run_rsp_microcode(rdram, task, n_aspMain);
+            // run_rsp_microcode(rdram, task, aspMain);
         }
         // else if (task->t.type == M_NJPEGTASK) {
         //     run_rsp_microcode(rdram, task, njpgdspMain);
