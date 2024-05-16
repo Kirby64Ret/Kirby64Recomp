@@ -11,6 +11,7 @@
 namespace recomp {
 	enum class Game {
 		MM,
+		DKR,
 		K64,
 		None,
 		Quit
@@ -36,5 +37,7 @@ namespace recomp {
 	void start_game(Game game);
 	void message_box(const char* message);
 }
+
+#define CURRENT_GAME recomp::Game::K64
 
 #endif

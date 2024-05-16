@@ -1,0 +1,26 @@
+// mips instruction that needs to be implemented in recomp.h
+DDIVU
+
+// lib ido
+__f_to_ll_recomp
+__ll_lshift_recomp
+__ll_to_f_recomp
+__ull_rshift_recomp
+
+// libultra (needs to be stubbed or reimplemented)
+__osGetId_recomp
+__osPfsGetStatus_recomp
+__osSpSetStatus_recomp
+_removeEvents_00004DFC
+bcmp_recomp
+bcopy_recomp
+bzero_recomp
+func_800245F0
+osPfsInit_recomp
+osPfsIsPlug_recomp
+osPfsNumFiles_recomp
+rmonPrintf_recomp
+sqrtf_recomp
+
+
+// actual DKR asm funcs that need .size directives to be picked up by recomp

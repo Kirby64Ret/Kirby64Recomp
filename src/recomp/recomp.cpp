@@ -37,6 +37,7 @@ struct RomEntry {
 const std::unordered_map<recomp::Game, RomEntry> game_roms {
     { recomp::Game::MM, { 0xEF18B4A9E2386169ULL, std::u8string{recomp::mm_game_id} + u8".z64", "ZELDA MAJORA'S MASK" }},
     { recomp::Game::K64, { 0xD992BD1EBD3F8756ULL, std::u8string{recomp::k64_game_id} + u8".z64", "Kirby64" }},
+    { recomp::Game::DKR, { 0x68512C37A6FDA951ULL, std::u8string(recomp::dkr_game_id) + u8".z64", "Diddy Kong Racing"}}
 };
 
 bool check_hash(const std::vector<uint8_t>& rom_data, uint64_t expected_hash) {
@@ -215,7 +216,7 @@ recomp::RomValidationError recomp::select_rom(const std::filesystem::path& rom_p
             return recomp::RomValidationError::IncorrectVersion;
         }
         else {
-            if (game == recomp::Game::K64 && std::string_view{ reinterpret_cast<const char*>(rom_data.data()) + 0x20, 19 } == "THE LEGEND OF ZELDA") {
+            if (game == CURRENT_GAME && std::string_view{ reinterpret_cast<const char*>(rom_data.data()) + 0x20, 19 } == "THE LEGEND OF ZELDA") {
                 return recomp::RomValidationError::NotYet;
             }
             else {
@@ -410,8 +411,8 @@ void recomp::start(ultramodern::WindowHandle window_handle, const ultramodern::a
         recomp_context context{};
 
         switch (game_started.load()) {
-            case recomp::Game::K64:
-                if (!recomp::load_stored_rom(recomp::Game::K64)) {
+            case CURRENT_GAME:
+                if (!recomp::load_stored_rom(CURRENT_GAME)) {
                     recomp::message_box("Error opening stored ROM! Please restart this program.");
                 }
                 // ultramodern::load_shader_cache({mm_shader_cache_bytes, sizeof(mm_shader_cache_bytes)});

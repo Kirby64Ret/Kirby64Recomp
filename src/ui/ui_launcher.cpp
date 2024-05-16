@@ -21,7 +21,7 @@ void select_rom() {
 		NFD_FreePathN(native_path);
 		native_path = nullptr;
 
-		recomp::RomValidationError rom_error = recomp::select_rom(path, recomp::Game::K64);
+		recomp::RomValidationError rom_error = recomp::select_rom(path, CURRENT_GAME);
 
 		switch (rom_error) {
 			case recomp::RomValidationError::Good:
@@ -53,7 +53,7 @@ void select_rom() {
 class LauncherMenu : public recomp::MenuController {
 public:
     LauncherMenu() {
-		mm_rom_valid = recomp::is_rom_valid(recomp::Game::K64);
+		mm_rom_valid = recomp::is_rom_valid(CURRENT_GAME);
     }
 	~LauncherMenu() override {
 
@@ -75,7 +75,7 @@ public:
 		);
 		recomp::register_event(listener, "start_game",
 			[](const std::string& param, Rml::Event& event) {
-				recomp::start_game(recomp::Game::K64);
+				recomp::start_game(CURRENT_GAME);
 				recomp::set_current_menu(recomp::Menu::None);
 			}
 		);

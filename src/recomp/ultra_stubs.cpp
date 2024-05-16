@@ -68,4 +68,56 @@ extern "C" void __osContRamWrite_recomp(uint8_t *rdram, recomp_context *ctx) {
     assert(false);
 }
 
+extern "C" void __osGetId_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void __osPfsGetStatus_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void __osSpSetStatus_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void _removeEvents_00004DFC(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void bcmp_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void bcopy_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void bzero_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void func_800245F0(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void osPfsInit_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void osPfsIsPlug_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void osPfsNumFiles_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void rmonPrintf_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void sqrtf_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+
+extern "C" void __f_to_ll_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void __ll_lshift_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void __ll_to_f_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
+extern "C" void __ull_rshift_recomp(uint8_t *rdram, recomp_context *ctx) {
+    return;
+}
 

@@ -286,6 +286,8 @@ extern int32_t section_addresses[];
 // For Banjo-Tooie
 void recomp_syscall_handler(uint8_t* rdram, recomp_context* ctx, int32_t instruction_vram);
 
+#define DDIVU(target, source, lo, hi)
+
 // For the Mario Party games (not working)
 //// This has to be in this file so it can be inlined
 //struct jmp_buf_storage {
