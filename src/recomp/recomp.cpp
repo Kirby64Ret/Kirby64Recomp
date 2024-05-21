@@ -309,7 +309,7 @@ const char* get_rom_name();
     //     MEM_B(i, patch_data_address) = mm_patches_bin[i];
     // }
 // }
-
+void load_overlay(size_t section_table_index, int32_t ram);
 void init(uint8_t* rdram, recomp_context* ctx) {
     // Initialize the overlays
     init_overlays();
@@ -319,6 +319,8 @@ void init(uint8_t* rdram, recomp_context* ctx) {
 
     // Load overlays in the first 1MB
     load_overlays(0x1000, (int32_t)entrypoint, 1024 * 1024);
+    load_overlay(1, 0x8009B540);
+    load_overlay(2, 0x800F61A0);
 
     // Initial 1MB DMA (rom address 0x1000 = physical address 0x10001000)
     recomp::do_rom_read(rdram, entrypoint, 0x10001000, 0x100000);

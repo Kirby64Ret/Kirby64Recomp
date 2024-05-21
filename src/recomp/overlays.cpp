@@ -31,6 +31,7 @@ void load_overlay(size_t section_table_index, int32_t ram) {
     for (size_t function_index = 0; function_index < section.num_funcs; function_index++) {
         const FuncEntry& func = section.funcs[function_index];
         func_map[ram + func.offset] = func.func;
+        printf("[load_overlay]: loading func @ %08X;\n", ram + func.offset);
     }
     loaded_sections.emplace_back(ram, section_table_index);
     section_addresses[section.index] = ram;
@@ -150,7 +151,7 @@ void init_overlays() {
         }
     );
 
-    load_patch_functions();
+    // load_patch_functions();
 }
 
 extern "C" recomp_func_t * get_function(int32_t addr) {
