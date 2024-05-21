@@ -43,3 +43,37 @@ extern "C" void osVoiceClearDictionary_recomp(uint8_t * rdram, recomp_context * 
     assert(false);
 }
 
+extern "C" void __osContRamWrite_recomp(uint8_t* rdram, recomp_context *rtx) {
+    assert(false);
+}
+extern "C" void __osEnqueueThread_recomp(uint8_t* rdram, recomp_context *rtx) {
+    assert(false);
+}
+extern "C" void __osPfsRWInode_recomp(uint8_t* rdram, recomp_context *rtx) {
+    assert(false);
+}
+extern "C" void __osPopThread_recomp(uint8_t* rdram, recomp_context *rtx) {
+    assert(false);
+}
+extern "C" void __osSiGetAccess_recomp(uint8_t* rdram, recomp_context *rtx) {
+    assert(false);
+}
+extern "C" void __osSiRawStartDma_recomp(uint8_t* rdram, recomp_context *rtx) {
+    assert(false);
+}
+extern "C" void __osSiRelAccess_recomp(uint8_t* rdram, recomp_context *rtx) {
+    assert(false);
+}
+extern "C" void __osTimerInterrupt_recomp(uint8_t* rdram, recomp_context *rtx) {
+    assert(false);
+}
+extern "C" void __osViGetCurrentContext_recomp(uint8_t* rdram, recomp_context *rtx) {
+    assert(false);
+}
+extern "C" void __osViSwapContext_recomp(uint8_t* rdram, recomp_context *rtx) {
+    assert(false);
+}
+extern "C" void osEPiRawStartDma_recomp(uint8_t* rdram, recomp_context *rtx) {
+    assert(false);
+}
+

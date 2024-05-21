@@ -37,6 +37,4 @@ namespace recomp {
 	void message_box(const char* message);
 }
 
-#define CURRENT_GAME recomp::Game::K64
-
 #endif

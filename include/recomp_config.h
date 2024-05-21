@@ -6,7 +6,7 @@
 #include "../ultramodern/config.hpp"
 
 namespace recomp {
-    constexpr std::u8string_view program_id = u8"DKR64Recompiled";
+    constexpr std::u8string_view program_id = u8"Kirby64Recompiled";
     constexpr std::u8string_view mm_game_id = u8"mm.n64.us.1.0";
     constexpr std::u8string_view k64_game_id = u8"k64.n64.us.1.0";
 
@@ -36,6 +36,5 @@ namespace recomp {
     AutosaveMode get_autosave_mode();
     void set_autosave_mode(AutosaveMode mode);
 };
-#define CURRENT_GAME_ID recomp::k64_game_id
 
 #endif
