@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(OPT "-g -ggdb3")
 set(CMAKE_CXX_FLAGS "${OPT} ${CMAKE_CXX_FLAGS} -Wno-everything -Wall -Wextra")
+set(CMAKE_C_FLAGS "${OPT} ${CMAKE_C_FLAGS}")
 
 # Avoid warning about DOWNLOAD_EXTRACT_TIMESTAMP in CMake 3.24:
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")

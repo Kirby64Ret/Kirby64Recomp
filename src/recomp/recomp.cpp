@@ -329,7 +329,7 @@ void init(uint8_t* rdram, recomp_context* ctx) {
     // read_patch_data(rdram, (gpr)(s32)0x80801000);
 
     // Set up stack pointer
-    ctx->r29 = 0xFFFFFFFF803FFFF0u;
+    ctx->r29 = 0xFFFFFFFF80042D90u;
 
     // Set up context floats
     ctx->f_odd = &ctx->f0.u32h;
