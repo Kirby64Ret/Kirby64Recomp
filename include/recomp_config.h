@@ -7,6 +7,7 @@
 
 namespace recomp {
     constexpr std::u8string_view program_id = u8"Kirby64Recompiled";
+    constexpr std::string_view program_name = "Kirby 64: Recompiled";
     constexpr std::u8string_view mm_game_id = u8"mm.n64.us.1.0";
     constexpr std::u8string_view k64_game_id = u8"k64.n64.us.1.0";
 
