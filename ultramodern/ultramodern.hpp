@@ -160,7 +160,7 @@ void join_saving_thread();
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-// #define debug_printf(...)
-#define debug_printf(...) printf(__VA_ARGS__);
+#define debug_printf(...)
+//#define debug_printf(...) printf(__VA_ARGS__);
 
 #endif

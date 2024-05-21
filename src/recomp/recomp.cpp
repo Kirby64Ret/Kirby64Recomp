@@ -11,12 +11,13 @@
 #include <fstream>
 #include <iostream>
 #include "recomp.h"
+#include "recomp_overlays.h"
 #include "recomp_game.h"
 #include "recomp_config.h"
 #include "xxHash/xxh3.h"
 #include "../ultramodern/ultramodern.hpp"
-// #include "../../RecompiledPatches/patches_bin.h"
-// #include "mm_shader_cache.h"
+#include "../../RecompiledPatches/patches_bin.h"
+#include "mm_shader_cache.h"
 
 #ifdef _MSC_VER
 inline uint32_t byteswap(uint32_t val) {
@@ -36,8 +37,6 @@ struct RomEntry {
 
 const std::unordered_map<recomp::Game, RomEntry> game_roms {
     { recomp::Game::MM, { 0xEF18B4A9E2386169ULL, std::u8string{recomp::mm_game_id} + u8".z64", "ZELDA MAJORA'S MASK" }},
-    { recomp::Game::K64, { 0xD992BD1EBD3F8756ULL, std::u8string{recomp::k64_game_id} + u8".z64", "Kirby64" }},
-    { recomp::Game::DKR, { 0x68512C37A6FDA951ULL, std::u8string(recomp::dkr_game_id) + u8".z64", "Diddy Kong Racing"}}
 };
 
 bool check_hash(const std::vector<uint8_t>& rom_data, uint64_t expected_hash) {
@@ -216,7 +215,7 @@ recomp::RomValidationError recomp::select_rom(const std::filesystem::path& rom_p
             return recomp::RomValidationError::IncorrectVersion;
         }
         else {
-            if (game == CURRENT_GAME && std::string_view{ reinterpret_cast<const char*>(rom_data.data()) + 0x20, 19 } == "THE LEGEND OF ZELDA") {
+            if (game == recomp::Game::MM && std::string_view{ reinterpret_cast<const char*>(rom_data.data()) + 0x20, 19 } == "THE LEGEND OF ZELDA") {
                 return recomp::RomValidationError::NotYet;
             }
             else {
@@ -303,14 +302,11 @@ void run_thread_function(uint8_t* rdram, uint64_t addr, uint64_t sp, uint64_t ar
 extern "C" void recomp_entrypoint(uint8_t * rdram, recomp_context * ctx);
 gpr get_entrypoint_address();
 const char* get_rom_name();
-void init_overlays();
-extern "C" void load_overlays(uint32_t rom, int32_t ram_addr, uint32_t size);
-extern "C" void unload_overlays(int32_t ram_addr, uint32_t size);
 
 void read_patch_data(uint8_t* rdram, gpr patch_data_address) {
-    // for (size_t i = 0; i < sizeof(mm_patches_bin); i++) {
-    //     MEM_B(i, patch_data_address) = mm_patches_bin[i];
-    // }
+    for (size_t i = 0; i < sizeof(mm_patches_bin); i++) {
+        MEM_B(i, patch_data_address) = mm_patches_bin[i];
+    }
 }
 
 void init(uint8_t* rdram, recomp_context* ctx) {
@@ -327,7 +323,7 @@ void init(uint8_t* rdram, recomp_context* ctx) {
     recomp::do_rom_read(rdram, entrypoint, 0x10001000, 0x100000);
 
     // Read in any extra data from patches
-    // read_patch_data(rdram, (gpr)(s32)0x80801000);
+    read_patch_data(rdram, (gpr)(s32)0x80801000);
 
     // Set up stack pointer
     ctx->r29 = 0xFFFFFFFF803FFFF0u;
@@ -376,7 +372,7 @@ void ultramodern::quit() {
 
 void recomp::start(ultramodern::WindowHandle window_handle, const ultramodern::audio_callbacks_t& audio_callbacks, const ultramodern::input_callbacks_t& input_callbacks, const ultramodern::gfx_callbacks_t& gfx_callbacks_) {
     recomp::check_all_stored_roms();
-    // set_audio_callbacks(audio_callbacks);
+    set_audio_callbacks(audio_callbacks);
     set_input_callbacks(input_callbacks);
 
     ultramodern::gfx_callbacks_t gfx_callbacks = gfx_callbacks_;
@@ -411,11 +407,11 @@ void recomp::start(ultramodern::WindowHandle window_handle, const ultramodern::a
         recomp_context context{};
 
         switch (game_started.load()) {
-            case CURRENT_GAME:
-                if (!recomp::load_stored_rom(CURRENT_GAME)) {
+            case recomp::Game::MM:
+                if (!recomp::load_stored_rom(recomp::Game::MM)) {
                     recomp::message_box("Error opening stored ROM! Please restart this program.");
                 }
-                // ultramodern::load_shader_cache({mm_shader_cache_bytes, sizeof(mm_shader_cache_bytes)});
+                ultramodern::load_shader_cache({mm_shader_cache_bytes, sizeof(mm_shader_cache_bytes)});
                 init(rdram, &context);
                 try {
                     recomp_entrypoint(rdram, &context);

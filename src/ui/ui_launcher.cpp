@@ -6,7 +6,7 @@
 #include "nfd.h"
 #include <filesystem>
 
-std::string version_number = "v1.0.0";
+std::string version_number = "v1.0.1";
 
 Rml::DataModelHandle model_handle;
 bool mm_rom_valid = false;
@@ -21,7 +21,7 @@ void select_rom() {
 		NFD_FreePathN(native_path);
 		native_path = nullptr;
 
-		recomp::RomValidationError rom_error = recomp::select_rom(path, CURRENT_GAME);
+		recomp::RomValidationError rom_error = recomp::select_rom(path, recomp::Game::MM);
 
 		switch (rom_error) {
 			case recomp::RomValidationError::Good:
@@ -53,7 +53,7 @@ void select_rom() {
 class LauncherMenu : public recomp::MenuController {
 public:
     LauncherMenu() {
-		mm_rom_valid = recomp::is_rom_valid(CURRENT_GAME);
+		mm_rom_valid = recomp::is_rom_valid(recomp::Game::MM);
     }
 	~LauncherMenu() override {
 
@@ -75,7 +75,7 @@ public:
 		);
 		recomp::register_event(listener, "start_game",
 			[](const std::string& param, Rml::Event& event) {
-				recomp::start_game(CURRENT_GAME);
+				recomp::start_game(recomp::Game::MM);
 				recomp::set_current_menu(recomp::Menu::None);
 			}
 		);
