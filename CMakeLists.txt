@@ -5,9 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 # set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(OPT "-g -ggdb3")
 
-set(CMAKE_CXX_FLAGS "${OPT} ${CMAKE_CXX_FLAGS} -Wno-everything -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything -Wall -Wextra")
 
 # Avoid warning about DOWNLOAD_EXTRACT_TIMESTAMP in CMake 3.24:
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
@@ -43,8 +42,8 @@ add_library(RecompiledFuncs STATIC)
 
 target_compile_options(RecompiledFuncs PRIVATE
     # -Wno-unused-but-set-variable
-    -Wno-implicit-function-declaration
     -fno-strict-aliasing
+    -Wno-implicit-function-declaration
 )
 
 target_include_directories(RecompiledFuncs PRIVATE
@@ -76,10 +75,10 @@ target_sources(RecompiledFuncs PRIVATE ${FUNC_C_SOURCES} ${FUNC_CXX_SOURCES})
 # set_source_files_properties(${CMAKE_SOURCE_DIR}/RecompiledPatches/patches.c PROPERTIES COMPILE_FLAGS -fno-strict-aliasing)
 
 # # Build patches elf
-# add_custom_command(OUTPUT ${CMAKE_SOURCE_DIR}/patches/patches.bin
+# add_custom_target(PatchesBin
 #     COMMAND make
 #     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/patches
-#     BYPRODUCTS ${CMAKE_SOURCE_DIR}/patches/patches.bin}
+#     BYPRODUCTS ${CMAKE_SOURCE_DIR}/patches/patches.bin
 # )
 
 # # Generate patches_bin.c from patches.bin
@@ -264,6 +263,7 @@ if (LINUX)
 endif()
 
 target_link_libraries(Kirby64Recompiled PRIVATE
+    # PatchesLib
     RecompiledFuncs
     SDL2
     rt64
