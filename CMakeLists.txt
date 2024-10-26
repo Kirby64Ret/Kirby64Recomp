@@ -4,6 +4,7 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 set(OPT "-g -ggdb3")
@@ -48,10 +49,12 @@ target_compile_options(RecompiledFuncs PRIVATE
     # -Wno-unused-but-set-variable
     -fno-strict-aliasing
     -Wno-implicit-function-declaration
+    -fexceptions
 )
 
 target_include_directories(RecompiledFuncs PRIVATE
     ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/lib/N64ModernRuntime/librecomp/include/
 )
 
 file(GLOB FUNC_C_SOURCES ${CMAKE_SOURCE_DIR}/RecompiledFuncs/*.c)
@@ -113,6 +116,9 @@ add_executable(Kirby64Recompiled)
 
 set (SOURCES
     ${CMAKE_SOURCE_DIR}/src/main/main.cpp
+    ${CMAKE_SOURCE_DIR}/src/main/register_overlays.cpp
+    ${CMAKE_SOURCE_DIR}/src/main/register_patches.cpp
+    ${CMAKE_SOURCE_DIR}/src/main/rt64_render_context.cpp
     
     ${CMAKE_SOURCE_DIR}/src/game/input.cpp
     ${CMAKE_SOURCE_DIR}/src/game/controls.cpp
@@ -150,6 +156,7 @@ target_include_directories(Kirby64Recompiled PRIVATE
     ${CMAKE_SOURCE_DIR}/lib/freetype-windows-binaries/include
     ${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/nativefiledialog-extended/src/include
     ${CMAKE_SOURCE_DIR}/lib/N64ModernRuntime/ultramodern/include/
+    ${CMAKE_SOURCE_DIR}/lib/N64ModernRuntime/librecomp/include/
     ${CMAKE_BINARY_DIR}/shaders
     ${CMAKE_CURRENT_BINARY_DIR}
 )
@@ -245,6 +252,8 @@ target_link_libraries(Kirby64Recompiled PRIVATE
     RmlDebugger
     nfd
     lunasvg
+    ultramodern
+    librecomp
 )
 
 # TODO fix the rt64 CMake script so that this doesn't need to be duplicated here

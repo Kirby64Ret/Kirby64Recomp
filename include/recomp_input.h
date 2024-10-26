@@ -9,11 +9,14 @@
 #include <string>
 #include <string_view>
 
+#include "ultramodern/input.hpp"
+
 #include "json/json.hpp"
 
 namespace recomp {
     // x-macros to build input enums and arrays.
     // First parameter is the enum name, second parameter is the bit field for the input (or 0 if there is no associated one), third is the readable name.
+    // TODO refactor this to allow projects to rename these, or get rid of the readable name and leave that up to individual projects to map.
     #define DEFINE_N64_BUTTON_INPUTS() \
         DEFINE_INPUT(A, 0x8000, "Action") \
         DEFINE_INPUT(B, 0x4000, "Attack/Cancel") \
@@ -36,9 +39,15 @@ namespace recomp {
         DEFINE_INPUT(X_AXIS_NEG, 0, "Left") \
         DEFINE_INPUT(X_AXIS_POS, 0, "Right") \
 
+    #define DEFINE_RECOMP_UI_INPUTS() \
+        DEFINE_INPUT(TOGGLE_MENU, 0, "Toggle Menu") \
+        DEFINE_INPUT(ACCEPT_MENU, 0, "Accept (Menu)") \
+        DEFINE_INPUT(APPLY_MENU, 0, "Apply (Menu)")
+
     #define DEFINE_ALL_INPUTS() \
         DEFINE_N64_BUTTON_INPUTS() \
-        DEFINE_N64_AXIS_INPUTS()
+        DEFINE_N64_AXIS_INPUTS() \
+        DEFINE_RECOMP_UI_INPUTS()
 
     // Enum containing every recomp input.
     #define DEFINE_INPUT(name, value, readable) name,
@@ -67,6 +76,7 @@ namespace recomp {
     bool get_input_digital(const std::span<const recomp::InputField> fields);
     void get_gyro_deltas(float* x, float* y);
     void get_mouse_deltas(float* x, float* y);
+    void get_right_analog(float* x, float* y);
 
     enum class InputDevice {
         Controller,
@@ -80,6 +90,7 @@ namespace recomp {
     void cancel_scanning_input();
     void config_menu_set_cont_or_kb(bool cont_interacted);
     InputField get_scanned_input();
+    int get_scanned_input_index();
     
     struct DefaultN64Mappings {
         std::vector<InputField> a;
@@ -103,7 +114,38 @@ namespace recomp {
         std::vector<InputField> analog_right;
         std::vector<InputField> analog_up;
         std::vector<InputField> analog_down;
+
+        std::vector<InputField> toggle_menu;
+        std::vector<InputField> accept_menu;
+        std::vector<InputField> apply_menu;
     };
+
+    constexpr const std::vector<InputField>& get_default_mapping_for_input(const DefaultN64Mappings& defaults, const GameInput input) {
+        switch (input) {
+            case GameInput::A: return defaults.a;
+            case GameInput::B: return defaults.b;
+            case GameInput::L: return defaults.l;
+            case GameInput::R: return defaults.r;
+            case GameInput::Z: return defaults.z;
+            case GameInput::START: return defaults.start;
+            case GameInput::C_LEFT: return defaults.c_left;
+            case GameInput::C_RIGHT: return defaults.c_right;
+            case GameInput::C_UP: return defaults.c_up;
+            case GameInput::C_DOWN: return defaults.c_down;
+            case GameInput::DPAD_LEFT: return defaults.dpad_left;
+            case GameInput::DPAD_RIGHT: return defaults.dpad_right;
+            case GameInput::DPAD_UP: return defaults.dpad_up;
+            case GameInput::DPAD_DOWN: return defaults.dpad_down;
+            case GameInput::X_AXIS_NEG: return defaults.analog_left;
+            case GameInput::X_AXIS_POS: return defaults.analog_right;
+            case GameInput::Y_AXIS_POS: return defaults.analog_up;
+            case GameInput::Y_AXIS_NEG: return defaults.analog_down;
+            case GameInput::TOGGLE_MENU: return defaults.toggle_menu;
+            case GameInput::ACCEPT_MENU: return defaults.accept_menu;
+            case GameInput::APPLY_MENU: return defaults.apply_menu;
+            default: return std::vector<InputField>();
+        }
+    }
 
     extern const DefaultN64Mappings default_n64_keyboard_mappings;
     extern const DefaultN64Mappings default_n64_controller_mappings;
@@ -117,10 +159,12 @@ namespace recomp {
     InputField& get_input_binding(GameInput input, size_t binding_index, InputDevice device);
     void set_input_binding(GameInput input, size_t binding_index, InputDevice device, InputField value);
 
-    void get_n64_input(uint16_t* buttons_out, float* x_out, float* y_out);
-    void set_rumble(bool);
+    bool get_n64_input(int controller_num, uint16_t* buttons_out, float* x_out, float* y_out);
+    void set_rumble(int controller_num, bool);
     void update_rumble();
     void handle_events();
+
+    ultramodern::input::connected_device_info_t get_connected_device_info(int controller_num);
     
     // Rumble strength ranges from 0 to 100.
     int get_rumble_strength();
@@ -129,22 +173,12 @@ namespace recomp {
     // Gyro and mouse sensitivities range from 0 to 100.
     int get_gyro_sensitivity();
     int get_mouse_sensitivity();
+    int get_joystick_deadzone();
     void set_gyro_sensitivity(int strength);
     void set_mouse_sensitivity(int strength);
-
-    enum class TargetingMode {
-        Switch,
-        Hold,
-		OptionCount
-    };
-
-    NLOHMANN_JSON_SERIALIZE_ENUM(recomp::TargetingMode, {
-        {recomp::TargetingMode::Switch, "Switch"},
-        {recomp::TargetingMode::Hold, "Hold"}
-    });
-
-    TargetingMode get_targeting_mode();
-    void set_targeting_mode(TargetingMode mode);
+    void set_joystick_deadzone(int strength);
+    void apply_joystick_deadzone(float x_in, float y_in, float* x_out, float* y_out);
+    void set_right_analog_suppressed(bool suppressed);
 
     enum class BackgroundInputMode {
         On,
@@ -162,12 +196,6 @@ namespace recomp {
 
     bool game_input_disabled();
     bool all_input_disabled();
-
-    // TODO move these
-    void quicksave_save();
-    void quicksave_load();
-
-    void open_quit_game_prompt();
 }
 
 #endif

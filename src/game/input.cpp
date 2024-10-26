@@ -2,11 +2,11 @@
 #include <mutex>
 
 #include "ultramodern/ultramodern.hpp"
-#include "recomp.h"
+#include "librecomp/recomp.h"
 #include "recomp_input.h"
+#include "zelda_config.h"
 #include "recomp_ui.h"
 #include "SDL.h"
-#include "rt64_layer.h"
 #include "promptfont.h"
 #include "GamepadMotion.hpp"
 
@@ -75,13 +75,13 @@ void recomp::stop_scanning_input() {
 
 void queue_if_enabled(SDL_Event* event) {
     if (!recomp::all_input_disabled()) {
-        recomp::queue_event(*event);
+        recompui::queue_event(*event);
     }
 }
 
 static std::atomic_bool cursor_enabled = true;
 
-void recomp::set_cursor_visible(bool visible) {
+void recompui::set_cursor_visible(bool visible) {
     cursor_enabled.store(visible);
 }
 
@@ -102,15 +102,16 @@ bool sdl_event_filter(void* userdata, SDL_Event* event) {
         {
             SDL_KeyboardEvent* keyevent = &event->key;
 
-            // Skip repeated events.
-            if (event->key.repeat) {
+            // Skip repeated events when not in the menu
+            if (recompui::get_current_menu() == recompui::Menu::None &&
+                event->key.repeat) {
                 break;
             }
 
             if ((keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_RETURN && (keyevent->keysym.mod & SDL_Keymod::KMOD_ALT)) ||
                 keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_F11
             ) {
-                recomp::toggle_fullscreen();
+                recompui::toggle_fullscreen();
             }
             if (scanning_device != recomp::InputDevice::COUNT) {
                 if (keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_ESCAPE) {
@@ -155,12 +156,12 @@ bool sdl_event_filter(void* userdata, SDL_Event* event) {
             return true;
         }
 
-        if (recomp::get_current_menu() != recomp::Menu::Config) {
-            recomp::set_current_menu(recomp::Menu::Config);
+        if (recompui::get_current_menu() != recompui::Menu::Config) {
+            recompui::set_current_menu(recompui::Menu::Config);
         }
 
-        recomp::open_quit_game_prompt();
-        recomp::activate_mouse();
+        zelda64::open_quit_game_prompt();
+        recompui::activate_mouse();
         break;
     }
     case SDL_EventType::SDL_MOUSEWHEEL:
@@ -172,10 +173,25 @@ bool sdl_event_filter(void* userdata, SDL_Event* event) {
         break;
     case SDL_EventType::SDL_CONTROLLERBUTTONDOWN:
         if (scanning_device != recomp::InputDevice::COUNT) {
-            if (event->cbutton.button == SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_BACK) {
+            auto menuToggleBinding0 = recomp::get_input_binding(recomp::GameInput::TOGGLE_MENU, 0, recomp::InputDevice::Controller);
+            auto menuToggleBinding1 = recomp::get_input_binding(recomp::GameInput::TOGGLE_MENU, 1, recomp::InputDevice::Controller);
+            // note - magic number: 0 is InputType::None
+            if ((menuToggleBinding0.input_type != 0 && event->cbutton.button == menuToggleBinding0.input_id) ||
+                (menuToggleBinding1.input_type != 0 && event->cbutton.button == menuToggleBinding1.input_id)) {
                 recomp::cancel_scanning_input();
             } else if (scanning_device == recomp::InputDevice::Controller) {
                 SDL_ControllerButtonEvent* button_event = &event->cbutton;
+                auto scanned_input_index = recomp::get_scanned_input_index();
+                if ((scanned_input_index == static_cast<int>(recomp::GameInput::TOGGLE_MENU) ||
+                     scanned_input_index == static_cast<int>(recomp::GameInput::ACCEPT_MENU) ||
+                     scanned_input_index == static_cast<int>(recomp::GameInput::APPLY_MENU)) && (
+                     button_event->button == SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_DPAD_UP ||
+                     button_event->button == SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_DPAD_DOWN ||
+                     button_event->button == SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_DPAD_LEFT ||
+                     button_event->button == SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_DPAD_RIGHT)) {
+                    break;
+                }
+
                 set_scanned_input({(uint32_t)InputType::ControllerDigital, button_event->button});
             }
         } else {
@@ -184,12 +200,33 @@ bool sdl_event_filter(void* userdata, SDL_Event* event) {
         break;
     case SDL_EventType::SDL_CONTROLLERAXISMOTION:
         if (scanning_device == recomp::InputDevice::Controller) {
+            auto scanned_input_index = recomp::get_scanned_input_index();
+            if (scanned_input_index == static_cast<int>(recomp::GameInput::TOGGLE_MENU) ||
+                scanned_input_index == static_cast<int>(recomp::GameInput::ACCEPT_MENU) ||
+                scanned_input_index == static_cast<int>(recomp::GameInput::APPLY_MENU)) {
+                break;
+            }
+
             SDL_ControllerAxisEvent* axis_event = &event->caxis;
             float axis_value = axis_event->value * (1/32768.0f);
             if (axis_value > axis_threshold) {
+                SDL_Event set_stick_return_event;
+                set_stick_return_event.type = SDL_USEREVENT;
+                set_stick_return_event.user.code = axis_event->axis;
+                set_stick_return_event.user.data1 = nullptr;
+                set_stick_return_event.user.data2 = nullptr;
+                recompui::queue_event(set_stick_return_event);
+                
                 set_scanned_input({(uint32_t)InputType::ControllerAnalog, axis_event->axis + 1});
             }
             else if (axis_value < -axis_threshold) {
+                SDL_Event set_stick_return_event;
+                set_stick_return_event.type = SDL_USEREVENT;
+                set_stick_return_event.user.code = axis_event->axis;
+                set_stick_return_event.user.data1 = nullptr;
+                set_stick_return_event.user.data2 = nullptr;
+                recompui::queue_event(set_stick_return_event);
+
                 set_scanned_input({(uint32_t)InputType::ControllerAnalog, -axis_event->axis - 1});
             }
         } else {
@@ -325,6 +362,15 @@ const recomp::DefaultN64Mappings recomp::default_n64_keyboard_mappings = {
     .analog_down = {
         {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_S}
     },
+    .toggle_menu = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_ESCAPE}
+    },
+    .accept_menu = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_RETURN}
+    },
+    .apply_menu = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_F}
+    }
 };
 
 const recomp::DefaultN64Mappings recomp::default_n64_controller_mappings = {
@@ -386,6 +432,16 @@ const recomp::DefaultN64Mappings recomp::default_n64_controller_mappings = {
     .analog_down = {
         {.input_type = (uint32_t)InputType::ControllerAnalog, .input_id = SDL_CONTROLLER_AXIS_LEFTY + 1},
     },
+    .toggle_menu = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_BACK},
+    },
+    .accept_menu = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_SOUTH},
+    },
+    .apply_menu = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_WEST},
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_START}
+    }
 };
 
 void recomp::poll_inputs() {
@@ -425,18 +481,35 @@ void recomp::poll_inputs() {
         bool save_is_held = InputState.keys[SDL_SCANCODE_F5] != 0;
         bool load_is_held = InputState.keys[SDL_SCANCODE_F7] != 0;
         if (save_is_held && !save_was_held) {
-            recomp::quicksave_save();
+            zelda64::quicksave_save();
         }
         else if (load_is_held && !load_was_held) {
-            recomp::quicksave_load();
+            zelda64::quicksave_load();
         }
         save_was_held = save_is_held;
     }
     #endif
 }
 
-void recomp::set_rumble(bool on) {
-    InputState.rumble_active = on;
+void recomp::set_rumble(int controller_num, bool on) {
+    if (controller_num == 0) {
+        InputState.rumble_active = on;
+    }
+}
+
+ultramodern::input::connected_device_info_t recomp::get_connected_device_info(int controller_num) {
+    switch (controller_num) {
+        case 0:
+            return ultramodern::input::connected_device_info_t {
+                .connected_device = ultramodern::input::Device::Controller,
+                .connected_pak = ultramodern::input::Pak::RumblePak,
+            };
+    }
+
+    return ultramodern::input::connected_device_info_t {
+        .connected_device = ultramodern::input::Device::None,
+        .connected_pak = ultramodern::input::Pak::None,
+    };
 }
 
 static float smoothstep(float from, float to, float amount) {
@@ -483,7 +556,9 @@ bool controller_button_state(int32_t input_id) {
     return false;
 }
 
-float controller_axis_state(int32_t input_id) {
+static std::atomic_bool right_analog_suppressed = false;
+
+float controller_axis_state(int32_t input_id, bool allow_suppression) {
     if (abs(input_id) - 1 < SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_MAX) {
         SDL_GameControllerAxis axis = (SDL_GameControllerAxis)(abs(input_id) - 1);
         bool negative_range = input_id < 0;
@@ -495,6 +570,12 @@ float controller_axis_state(int32_t input_id) {
                 float cur_val = SDL_GameControllerGetAxis(controller, axis) * (1/32768.0f);
                 if (negative_range) {
                     cur_val = -cur_val;
+                }
+
+                // Check if this input is a right analog axis and suppress it accordingly.
+                if (allow_suppression && right_analog_suppressed.load() &&
+                    (axis == SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_RIGHTX || axis == SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_RIGHTY)) {
+                    cur_val = 0;
                 }
                 ret += std::clamp(cur_val, 0.0f, 1.0f);
             }
@@ -518,7 +599,7 @@ float recomp::get_input_analog(const recomp::InputField& field) {
     case InputType::ControllerDigital:
         return controller_button_state(field.input_id) ? 1.0f : 0.0f;
     case InputType::ControllerAnalog:
-        return controller_axis_state(field.input_id);
+        return controller_axis_state(field.input_id, true);
     case InputType::Mouse:
         // TODO mouse support
         return 0.0f;
@@ -549,7 +630,7 @@ bool recomp::get_input_digital(const recomp::InputField& field) {
         return controller_button_state(field.input_id);
     case InputType::ControllerAnalog:
         // TODO adjustable threshold
-        return controller_axis_state(field.input_id) >= axis_threshold;
+        return controller_axis_state(field.input_id, true) >= axis_threshold;
     case InputType::Mouse:
         // TODO mouse support
         return false;
@@ -580,9 +661,58 @@ void recomp::get_mouse_deltas(float* x, float* y) {
     *y = cur_mouse_delta[1] * sensitivity;
 }
 
+void recomp::apply_joystick_deadzone(float x_in, float y_in, float* x_out, float* y_out) {
+    float joystick_deadzone = (float)recomp::get_joystick_deadzone() / 100.0f;
+
+    if(fabsf(x_in) < joystick_deadzone) {
+        x_in = 0.0f;
+    }
+    else {
+        if(x_in > 0.0f) {
+            x_in -= joystick_deadzone;
+        } 
+        else {
+            x_in += joystick_deadzone;
+        }
+
+        x_in /= (1.0f - joystick_deadzone);
+    }
+
+    if(fabsf(y_in) < joystick_deadzone) {
+        y_in = 0.0f;
+    }
+    else {
+        if(y_in > 0.0f) {
+            y_in -= joystick_deadzone;
+        } 
+        else {
+            y_in += joystick_deadzone;
+        }
+
+        y_in /= (1.0f - joystick_deadzone);
+    }
+
+    *x_out = x_in;
+    *y_out = y_in;
+}
+
+void recomp::get_right_analog(float* x, float* y) {
+    float x_val =
+        controller_axis_state((SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_RIGHTX + 1), false) -
+        controller_axis_state(-(SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_RIGHTX + 1), false);
+    float y_val =
+        controller_axis_state((SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_RIGHTY + 1), false) -
+        controller_axis_state(-(SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_RIGHTY + 1), false);
+    recomp::apply_joystick_deadzone(x_val, y_val, x, y);
+}
+
+void recomp::set_right_analog_suppressed(bool suppressed) {
+    right_analog_suppressed.store(suppressed);
+}
+
 bool recomp::game_input_disabled() {
     // Disable input if any menu is open.
-    return recomp::get_current_menu() != recomp::Menu::None;
+    return recompui::get_current_menu() != recompui::Menu::None;
 }
 
 bool recomp::all_input_disabled() {
@@ -593,35 +723,35 @@ bool recomp::all_input_disabled() {
 std::string controller_button_to_string(SDL_GameControllerButton button) {
     switch (button) {
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_A:
-        return "\u21A7";
+        return PF_GAMEPAD_A;
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_B:
-        return "\u21A6";
+        return PF_GAMEPAD_B;
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_X:
-        return "\u21A4";
+        return PF_GAMEPAD_X;
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_Y:
-        return "\u21A5";
+        return PF_GAMEPAD_Y;
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_BACK:
-        return "\u21FA";
-    // case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_GUIDE:
-    //     return "";
+        return PF_XBOX_VIEW;
+    case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_GUIDE:
+        return PF_GAMEPAD_HOME;
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_START:
-        return "\u21FB";
+        return PF_XBOX_MENU;
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_LEFTSTICK:
-        return "\u21BA";
+        return PF_ANALOG_L_CLICK;
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_RIGHTSTICK:
-        return "\u21BB";
+        return PF_ANALOG_R_CLICK;
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-        return "\u2198";
+        return PF_XBOX_LEFT_SHOULDER;
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-        return "\u2199";
+        return PF_XBOX_RIGHT_SHOULDER;
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_DPAD_UP:
-        return "\u219F";
+        return PF_DPAD_UP;
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-        return "\u21A1";
+        return PF_DPAD_DOWN;
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-        return "\u219E";
+        return PF_DPAD_LEFT;
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-        return "\u21A0";
+        return PF_DPAD_RIGHT;
     // case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_MISC1:
     //     return "";
     // case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_PADDLE1:
@@ -633,7 +763,7 @@ std::string controller_button_to_string(SDL_GameControllerButton button) {
     // case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_PADDLE4:
     //     return "";
     case SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_TOUCHPAD:
-        return "\u21E7";
+        return PF_SONY_TOUCHPAD;
     default:
         return "Button " + std::to_string(button);
     }
@@ -709,6 +839,8 @@ std::unordered_map<SDL_Scancode, std::string> scancode_codepoints {
     {SDL_SCANCODE_RETURN, PF_KEYBOARD_ENTER},
     {SDL_SCANCODE_CAPSLOCK, PF_KEYBOARD_CAPS},
     {SDL_SCANCODE_NUMLOCKCLEAR, PF_KEYBOARD_NUM_LOCK},
+    {SDL_SCANCODE_LSHIFT, "L" PF_KEYBOARD_SHIFT},
+    {SDL_SCANCODE_RSHIFT, "R" PF_KEYBOARD_SHIFT},
 };
 
 std::string keyboard_input_to_string(SDL_Scancode key) {

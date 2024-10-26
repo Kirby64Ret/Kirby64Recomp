@@ -1,26 +1,30 @@
-// mips instruction that needs to be implemented in recomp.h
-DDIVU
-
-// lib ido
-__f_to_ll_recomp
-__ll_lshift_recomp
-__ll_to_f_recomp
-__ull_rshift_recomp
-
-// libultra (needs to be stubbed or reimplemented)
-__osGetId_recomp
-__osPfsGetStatus_recomp
-__osSpSetStatus_recomp
-_removeEvents_00004DFC
-bcmp_recomp
-bcopy_recomp
-bzero_recomp
-func_800245F0
-osPfsInit_recomp
-osPfsIsPlug_recomp
-osPfsNumFiles_recomp
-rmonPrintf_recomp
-sqrtf_recomp
-
-
-// actual DKR asm funcs that need .size directives to be picked up by recomp
+VI_H_START_REG
+VI_H_SYNC_REG
+VI_INTR_REG
+VI_LEAP_REG
+VI_ORIGIN_REG
+VI_STATUS_REG
+VI_V_BURST_REG
+VI_V_CURRENT_LINE_REG
+VI_V_START_REG
+VI_V_SYNC_REG
+VI_WIDTH_REG
+VI_X_SCALE_REG
+VI_Y_SCALE_REG
+__osContRamWrite_recomp
+__osEnqueueThread_recomp
+__osPfsRWInode_recomp
+__osPopThread_recomp
+__osSiGetAccess_recomp
+__osSiRawStartDma_recomp
+__osSiRelAccess_recomp
+__osTimerInterrupt_recomp
+__osViGetCurrentContext_recomp
+__osViSwapContext_recomp
+recomp_ovl_load_hook
+zelda64::register_overlays()
+zelda64::register_patches()
+zelda64::renderer::RT64HighPrecisionFBEnabled()
+zelda64::renderer::RT64MaxMSAA()
+zelda64::renderer::RT64SamplePositionsSupported()
+zelda64::renderer::create_render_context(unsigned char*, ultramodern::renderer::WindowHandle, bool)

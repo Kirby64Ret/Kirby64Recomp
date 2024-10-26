@@ -1,7 +1,9 @@
-#include "recomp_config.h"
+#include "zelda_config.h"
 #include "recomp_input.h"
-#include "recomp_sound.h"
+#include "zelda_sound.h"
+#include "zelda_render.h"
 #include "ultramodern/config.hpp"
+#include "librecomp/files.hpp"
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -17,21 +19,23 @@ constexpr std::u8string_view general_filename = u8"general.json";
 constexpr std::u8string_view graphics_filename = u8"graphics.json";
 constexpr std::u8string_view controls_filename = u8"controls.json";
 constexpr std::u8string_view sound_filename = u8"sound.json";
+constexpr std::u8string_view program_id = u8"Zelda64Recompiled";
 
-constexpr auto res_default            = ultramodern::Resolution::Auto;
-constexpr auto hr_default             = ultramodern::HUDRatioMode::Clamp16x9;
-constexpr auto api_default            = ultramodern::GraphicsApi::Auto;
-constexpr auto ar_default             = RT64::UserConfiguration::AspectRatio::Expand;
-constexpr auto msaa_default           = RT64::UserConfiguration::Antialiasing::MSAA2X;
-constexpr auto rr_default             = RT64::UserConfiguration::RefreshRate::Display;
+constexpr auto res_default            = ultramodern::renderer::Resolution::Auto;
+constexpr auto hr_default             = ultramodern::renderer::HUDRatioMode::Clamp16x9;
+constexpr auto api_default            = ultramodern::renderer::GraphicsApi::Auto;
+constexpr auto ar_default             = ultramodern::renderer::AspectRatio::Expand;
+constexpr auto msaa_default           = ultramodern::renderer::Antialiasing::MSAA2X;
+constexpr auto rr_default             = ultramodern::renderer::RefreshRate::Display;
+constexpr auto hpfb_default           = ultramodern::renderer::HighPrecisionFramebuffer::Auto;
 constexpr int ds_default              = 1;
 constexpr int rr_manual_default       = 60;
 constexpr bool developer_mode_default = false;
 
 static bool is_steam_deck = false;
 
-ultramodern::WindowMode wm_default() {
-    return is_steam_deck ? ultramodern::WindowMode::Fullscreen : ultramodern::WindowMode::Windowed;
+ultramodern::renderer::WindowMode wm_default() {
+    return is_steam_deck ? ultramodern::renderer::WindowMode::Fullscreen : ultramodern::renderer::WindowMode::Windowed;
 }
 
 #ifdef __gnu_linux__
@@ -83,7 +87,7 @@ void call_if_key_exists(void (*func)(T), const json& j, const std::string& key) 
 }
 
 namespace ultramodern {
-    void to_json(json& j, const GraphicsConfig& config) {
+    void to_json(json& j, const renderer::GraphicsConfig& config) {
         j = json{
             {"res_option",      config.res_option},
             {"wm_option",       config.wm_option},
@@ -93,12 +97,13 @@ namespace ultramodern {
             {"ar_option",       config.ar_option},
             {"msaa_option",     config.msaa_option},
             {"rr_option",       config.rr_option},
+            {"hpfb_option",     config.hpfb_option},
             {"rr_manual_value", config.rr_manual_value},
             {"developer_mode",  config.developer_mode},
         };
     }
 
-    void from_json(const json& j, GraphicsConfig& config) {
+    void from_json(const json& j, renderer::GraphicsConfig& config) {
         config.res_option       = from_or_default(j, "res_option",      res_default);
         config.wm_option        = from_or_default(j, "wm_option",       wm_default());
         config.hr_option        = from_or_default(j, "hr_option",       hr_default);
@@ -107,6 +112,7 @@ namespace ultramodern {
         config.ar_option        = from_or_default(j, "ar_option",       ar_default);
         config.msaa_option      = from_or_default(j, "msaa_option",     msaa_default);
         config.rr_option        = from_or_default(j, "rr_option",       rr_default);
+        config.hpfb_option      = from_or_default(j, "hpfb_option",     hpfb_default);
         config.rr_manual_value  = from_or_default(j, "rr_manual_value", rr_manual_default);
         config.developer_mode   = from_or_default(j, "developer_mode",  developer_mode_default);
     }
@@ -123,7 +129,12 @@ namespace recomp {
     }
 }
 
-std::filesystem::path recomp::get_app_folder_path() {
+std::filesystem::path zelda64::get_app_folder_path() {
+   // directly check for portable.txt (windows and native linux binary)    
+   if (std::filesystem::exists("portable.txt")) {
+       return std::filesystem::current_path();
+   }
+
    std::filesystem::path recomp_dir{};
 
 #if defined(_WIN32)
@@ -131,11 +142,16 @@ std::filesystem::path recomp::get_app_folder_path() {
    PWSTR known_path = NULL;
    HRESULT result = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &known_path);
    if (result == S_OK) {
-       recomp_dir = std::filesystem::path{known_path} / recomp::program_id;
+       recomp_dir = std::filesystem::path{known_path} / zelda64::program_id;
    }
 
    CoTaskMemFree(known_path);
 #elif defined(__linux__)
+   // check for APP_FOLDER_PATH env var used by AppImage
+   if (getenv("APP_FOLDER_PATH") != nullptr) {
+       return std::filesystem::path{getenv("APP_FOLDER_PATH")};
+   }
+
    const char *homedir;
 
    if ((homedir = getenv("HOME")) == nullptr) {
@@ -143,45 +159,94 @@ std::filesystem::path recomp::get_app_folder_path() {
    }
 
    if (homedir != nullptr) {
-       recomp_dir = std::filesystem::path{homedir} / (std::u8string{u8".config/"} + std::u8string{recomp::program_id});
+       recomp_dir = std::filesystem::path{homedir} / (std::u8string{u8".config/"} + std::u8string{zelda64::program_id});
    }
 #endif
 
     return recomp_dir;
 }
 
-void save_general_config(const std::filesystem::path& path) {
-    std::ofstream config_file{path};
-    
+bool read_json(std::ifstream input_file, nlohmann::json& json_out) {
+    if (!input_file.good()) {
+        return false;
+    }
+
+    try {
+        input_file >> json_out;
+    }
+    catch (nlohmann::json::parse_error&) {
+        return false;
+    }
+    return true;
+}
+
+bool read_json_with_backups(const std::filesystem::path& path, nlohmann::json& json_out) {
+    // Try reading and parsing the base file.
+    if (read_json(std::ifstream{path}, json_out)) {
+        return true;
+    }
+
+    // Try reading and parsing the backup file.
+    if (read_json(recomp::open_input_backup_file(path), json_out)) {
+        return true;
+    }
+
+    // Both reads failed.
+    return false;
+}
+
+bool save_json_with_backups(const std::filesystem::path& path, const nlohmann::json& json_data) {
+    {
+        std::ofstream output_file = recomp::open_output_file_with_backup(path);
+        if (!output_file.good()) {
+            return false;
+        }
+
+        output_file << std::setw(4) << json_data;
+    }
+    return recomp::finalize_output_file_with_backup(path);
+}
+
+bool save_general_config(const std::filesystem::path& path) {    
     nlohmann::json config_json{};
 
-    recomp::to_json(config_json["targeting_mode"], recomp::get_targeting_mode());
+    zelda64::to_json(config_json["targeting_mode"], zelda64::get_targeting_mode());
     recomp::to_json(config_json["background_input_mode"], recomp::get_background_input_mode());
     config_json["rumble_strength"] = recomp::get_rumble_strength();
     config_json["gyro_sensitivity"] = recomp::get_gyro_sensitivity();
     config_json["mouse_sensitivity"] = recomp::get_mouse_sensitivity();
-    config_json["autosave_mode"] = recomp::get_autosave_mode();
-    config_json["debug_mode"] = recomp::get_debug_mode_enabled();
-    config_file << std::setw(4) << config_json;
+    config_json["joystick_deadzone"] = recomp::get_joystick_deadzone();
+    config_json["autosave_mode"] = zelda64::get_autosave_mode();
+    config_json["camera_invert_mode"] = zelda64::get_camera_invert_mode();
+    config_json["analog_cam_mode"] = zelda64::get_analog_cam_mode();
+    config_json["analog_camera_invert_mode"] = zelda64::get_analog_camera_invert_mode();
+    config_json["debug_mode"] = zelda64::get_debug_mode_enabled();
+    
+    return save_json_with_backups(path, config_json);
 }
 
 void set_general_settings_from_json(const nlohmann::json& config_json) {
-    recomp::set_targeting_mode(from_or_default(config_json, "targeting_mode", recomp::TargetingMode::Switch));
+    zelda64::set_targeting_mode(from_or_default(config_json, "targeting_mode", zelda64::TargetingMode::Switch));
     recomp::set_background_input_mode(from_or_default(config_json, "background_input_mode", recomp::BackgroundInputMode::On));
     recomp::set_rumble_strength(from_or_default(config_json, "rumble_strength", 25));
     recomp::set_gyro_sensitivity(from_or_default(config_json, "gyro_sensitivity", 50));
     recomp::set_mouse_sensitivity(from_or_default(config_json, "mouse_sensitivity", is_steam_deck ? 50 : 0));
-    recomp::set_autosave_mode(from_or_default(config_json, "autosave_mode", recomp::AutosaveMode::On));
-    recomp::set_debug_mode_enabled(from_or_default(config_json, "debug_mode", false));
+    recomp::set_joystick_deadzone(from_or_default(config_json, "joystick_deadzone", 5));
+    zelda64::set_autosave_mode(from_or_default(config_json, "autosave_mode", zelda64::AutosaveMode::On));
+    zelda64::set_camera_invert_mode(from_or_default(config_json, "camera_invert_mode", zelda64::CameraInvertMode::InvertY));
+    zelda64::set_analog_cam_mode(from_or_default(config_json, "analog_cam_mode", zelda64::AnalogCamMode::Off));
+    zelda64::set_analog_camera_invert_mode(from_or_default(config_json, "analog_camera_invert_mode", zelda64::CameraInvertMode::InvertNone));
+    zelda64::set_debug_mode_enabled(from_or_default(config_json, "debug_mode", false));
 }
 
-void load_general_config(const std::filesystem::path& path) {
-    std::ifstream config_file{path};
+bool load_general_config(const std::filesystem::path& path) {
     nlohmann::json config_json{};
-
-    config_file >> config_json;
+    if (!read_json_with_backups(path, config_json)) {
+        return false;
+    }
 
     set_general_settings_from_json(config_json);
+    return true;
 }
 
 void assign_mapping(recomp::InputDevice device, recomp::GameInput input, const std::vector<recomp::InputField>& value) {
@@ -221,23 +286,40 @@ void assign_all_mappings(recomp::InputDevice device, const recomp::DefaultN64Map
     assign_mapping_complete(device, recomp::GameInput::X_AXIS_POS, values.analog_right);
     assign_mapping_complete(device, recomp::GameInput::Y_AXIS_NEG, values.analog_down);
     assign_mapping_complete(device, recomp::GameInput::Y_AXIS_POS, values.analog_up);
+
+    assign_mapping_complete(device, recomp::GameInput::TOGGLE_MENU, values.toggle_menu);
+    assign_mapping_complete(device, recomp::GameInput::ACCEPT_MENU, values.accept_menu);
+    assign_mapping_complete(device, recomp::GameInput::APPLY_MENU, values.apply_menu);
 };
 
-void recomp::reset_input_bindings() {
+void zelda64::reset_input_bindings() {
     assign_all_mappings(recomp::InputDevice::Keyboard, recomp::default_n64_keyboard_mappings);
     assign_all_mappings(recomp::InputDevice::Controller, recomp::default_n64_controller_mappings);
 }
 
-void recomp::reset_cont_input_bindings() {
+void zelda64::reset_cont_input_bindings() {
     assign_all_mappings(recomp::InputDevice::Controller, recomp::default_n64_controller_mappings);
 }
 
-void recomp::reset_kb_input_bindings() {
+void zelda64::reset_kb_input_bindings() {
     assign_all_mappings(recomp::InputDevice::Keyboard, recomp::default_n64_keyboard_mappings);
+}
+
+void zelda64::reset_single_input_binding(recomp::InputDevice device, recomp::GameInput input) {
+    assign_mapping_complete(
+        device,
+        input,
+        recomp::get_default_mapping_for_input(
+            device == recomp::InputDevice::Keyboard ?
+                recomp::default_n64_keyboard_mappings :
+                recomp::default_n64_controller_mappings,
+            input
+        )
+    );
 }
 
 void reset_graphics_options() {
-    ultramodern::GraphicsConfig new_config{};
+    ultramodern::renderer::GraphicsConfig new_config{};
     new_config.res_option = res_default;
     new_config.wm_option = wm_default();
     new_config.hr_option = hr_default;
@@ -245,28 +327,28 @@ void reset_graphics_options() {
     new_config.ar_option = ar_default;
     new_config.msaa_option = msaa_default;
     new_config.rr_option = rr_default;
+    new_config.hpfb_option = hpfb_default;
     new_config.rr_manual_value = rr_manual_default;
     new_config.developer_mode = developer_mode_default;
-    ultramodern::set_graphics_config(new_config);
+    ultramodern::renderer::set_graphics_config(new_config);
 }
 
-void save_graphics_config(const std::filesystem::path& path) {
-    std::ofstream config_file{path};
-    
+bool save_graphics_config(const std::filesystem::path& path) {
     nlohmann::json config_json{};
-    ultramodern::to_json(config_json, ultramodern::get_graphics_config());
-    config_file << std::setw(4) << config_json;
+    ultramodern::to_json(config_json, ultramodern::renderer::get_graphics_config());
+    return save_json_with_backups(path, config_json);
 }
 
-void load_graphics_config(const std::filesystem::path& path) {
-    std::ifstream config_file{path};
+bool load_graphics_config(const std::filesystem::path& path) {
     nlohmann::json config_json{};
+    if (!read_json_with_backups(path, config_json)) {
+        return false;
+    }
 
-    config_file >> config_json;
-
-    ultramodern::GraphicsConfig new_config{};
+    ultramodern::renderer::GraphicsConfig new_config{};
     ultramodern::from_json(config_json, new_config);
-    ultramodern::set_graphics_config(new_config);
+    ultramodern::renderer::set_graphics_config(new_config);
+    return true;
 }
 
 void add_input_bindings(nlohmann::json& out, recomp::GameInput input, recomp::InputDevice device) {
@@ -278,7 +360,7 @@ void add_input_bindings(nlohmann::json& out, recomp::GameInput input, recomp::In
     }
 };
 
-void save_controls_config(const std::filesystem::path& path) {
+bool save_controls_config(const std::filesystem::path& path) {
     nlohmann::json config_json{};
 
     config_json["keyboard"] = {};
@@ -291,8 +373,7 @@ void save_controls_config(const std::filesystem::path& path) {
         add_input_bindings(config_json["controller"], cur_input, recomp::InputDevice::Controller);
     }
 
-    std::ofstream config_file{path};
-    config_file << std::setw(4) << config_json;
+    return save_json_with_backups(path, config_json);
 }
 
 bool load_input_device_from_json(const nlohmann::json& config_json, recomp::InputDevice device, const std::string& key) {
@@ -311,6 +392,16 @@ bool load_input_device_from_json(const nlohmann::json& config_json, recomp::Inpu
         // Check if the json object for the given input exists and that it's an array.
         auto find_input_it = mappings_json.find(input_name);
         if (find_input_it == mappings_json.end() || !find_input_it->is_array()) {
+            assign_mapping(
+                device,
+                cur_input,
+                recomp::get_default_mapping_for_input(
+                    device == recomp::InputDevice::Keyboard ?
+                    recomp::default_n64_keyboard_mappings :
+                    recomp::default_n64_controller_mappings,
+                    cur_input
+                )
+            );
             continue;
         }
         const nlohmann::json& input_json = *find_input_it;
@@ -326,11 +417,11 @@ bool load_input_device_from_json(const nlohmann::json& config_json, recomp::Inpu
     return true;
 }
 
-void load_controls_config(const std::filesystem::path& path) {
-    std::ifstream config_file{path};
+bool load_controls_config(const std::filesystem::path& path) {
     nlohmann::json config_json{};
-
-    config_file >> config_json;
+    if (!read_json_with_backups(path, config_json)) {
+        return false;
+    }
 
     if (!load_input_device_from_json(config_json, recomp::InputDevice::Keyboard, "keyboard")) {
         assign_all_mappings(recomp::InputDevice::Keyboard, recomp::default_n64_keyboard_mappings);
@@ -339,34 +430,36 @@ void load_controls_config(const std::filesystem::path& path) {
     if (!load_input_device_from_json(config_json, recomp::InputDevice::Controller, "controller")) {
         assign_all_mappings(recomp::InputDevice::Controller, recomp::default_n64_controller_mappings);
     }
+    return true;
 }
 
-void save_sound_config(const std::filesystem::path& path) {
+bool save_sound_config(const std::filesystem::path& path) {
     nlohmann::json config_json{};
 
-    config_json["bgm_volume"] = recomp::get_bgm_volume();
-    config_json["low_health_beeps"] = recomp::get_low_health_beeps_enabled();
+    config_json["main_volume"] = zelda64::get_main_volume();
+    config_json["bgm_volume"] = zelda64::get_bgm_volume();
+    config_json["low_health_beeps"] = zelda64::get_low_health_beeps_enabled();
     
-    std::ofstream config_file{path};
-    config_file << std::setw(4) << config_json;
+    return save_json_with_backups(path, config_json);
 }
 
-void load_sound_config(const std::filesystem::path& path) {
-    std::ifstream config_file{path};
+bool load_sound_config(const std::filesystem::path& path) {
     nlohmann::json config_json{};
+    if (!read_json_with_backups(path, config_json)) {
+        return false;
+    }
 
-    config_file >> config_json;
-
-    
-    recomp::reset_sound_settings();
-    call_if_key_exists(recomp::set_bgm_volume, config_json, "bgm_volume");
-    call_if_key_exists(recomp::set_low_health_beeps_enabled, config_json, "low_health_beeps");
+    zelda64::reset_sound_settings();
+    call_if_key_exists(zelda64::set_main_volume, config_json, "main_volume");
+    call_if_key_exists(zelda64::set_bgm_volume, config_json, "bgm_volume");
+    call_if_key_exists(zelda64::set_low_health_beeps_enabled, config_json, "low_health_beeps");
+    return true;
 }
 
-void recomp::load_config() {
+void zelda64::load_config() {
     detect_steam_deck();
 
-    std::filesystem::path recomp_dir = recomp::get_app_folder_path();
+    std::filesystem::path recomp_dir = zelda64::get_app_folder_path();
     std::filesystem::path general_path = recomp_dir / general_filename;
     std::filesystem::path graphics_path = recomp_dir / graphics_filename;
     std::filesystem::path controls_path = recomp_dir / controls_filename;
@@ -376,48 +469,40 @@ void recomp::load_config() {
         std::filesystem::create_directories(recomp_dir);
     }
 
-    if (std::filesystem::exists(general_path)) {
-        load_general_config(general_path);
-    }
-    else {
+    // TODO error handling for failing to save config files after resetting them.
+
+    if (!load_general_config(general_path)) {
         // Set the general settings from an empty json to use defaults.
         set_general_settings_from_json({});
         save_general_config(general_path);
     }
 
-    if (std::filesystem::exists(graphics_path)) {
-        load_graphics_config(graphics_path);
-    }
-    else {
+    if (!load_graphics_config(graphics_path)) {
         reset_graphics_options();
         save_graphics_config(graphics_path);
     }
 
-    if (std::filesystem::exists(controls_path)) {
-        load_controls_config(controls_path);
-    }
-    else {
-        recomp::reset_input_bindings();
+    if (!load_controls_config(controls_path)) {
+        zelda64::reset_input_bindings();
         save_controls_config(controls_path);
     }
 
-    if (std::filesystem::exists(sound_path)) {
-        load_sound_config(sound_path);
-    }
-    else {
-        recomp::reset_sound_settings();
+    if (!load_sound_config(sound_path)) {
+        zelda64::reset_sound_settings();
         save_sound_config(sound_path);
     }
 }
 
-void recomp::save_config() {
-    std::filesystem::path recomp_dir = recomp::get_app_folder_path();
+void zelda64::save_config() {
+    std::filesystem::path recomp_dir = zelda64::get_app_folder_path();
 
     if (recomp_dir.empty()) {
         return;
     }
 
     std::filesystem::create_directories(recomp_dir);
+    
+    // TODO error handling for failing to save config files.
 
     save_general_config(recomp_dir / general_filename);
     save_graphics_config(recomp_dir / graphics_filename);

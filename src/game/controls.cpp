@@ -1,6 +1,6 @@
 #include <array>
 
-#include "recomp_helpers.h"
+#include "librecomp/helpers.hpp"
 #include "recomp_input.h"
 #include "ultramodern/ultramodern.hpp"
 
@@ -75,10 +75,14 @@ void recomp::set_input_binding(recomp::GameInput input, size_t binding_index, re
     }
 }
 
-void recomp::get_n64_input(uint16_t* buttons_out, float* x_out, float* y_out) {
+bool recomp::get_n64_input(int controller_num, uint16_t* buttons_out, float* x_out, float* y_out) {
     uint16_t cur_buttons = 0;
     float cur_x = 0.0f;
     float cur_y = 0.0f;
+    
+    if (controller_num != 0) {
+        return false;
+    }
 
     if (!recomp::game_input_disabled()) {
         for (size_t i = 0; i < n64_button_values.size(); i++) {
@@ -87,17 +91,26 @@ void recomp::get_n64_input(uint16_t* buttons_out, float* x_out, float* y_out) {
             cur_buttons |= recomp::get_input_digital(controller_input_mappings[input_index]) ? n64_button_values[i] : 0;
         }
 
+        float joystick_deadzone = recomp::get_joystick_deadzone() / 100.0f;
+
+        float joystick_x = recomp::get_input_analog(controller_input_mappings[(size_t)GameInput::X_AXIS_POS])
+                        - recomp::get_input_analog(controller_input_mappings[(size_t)GameInput::X_AXIS_NEG]);
+
+        float joystick_y = recomp::get_input_analog(controller_input_mappings[(size_t)GameInput::Y_AXIS_POS])
+                        - recomp::get_input_analog(controller_input_mappings[(size_t)GameInput::Y_AXIS_NEG]);
+
+        recomp::apply_joystick_deadzone(joystick_x, joystick_y, &joystick_x, &joystick_y);
+
         cur_x = recomp::get_input_analog(keyboard_input_mappings[(size_t)GameInput::X_AXIS_POS])
-                - recomp::get_input_analog(keyboard_input_mappings[(size_t)GameInput::X_AXIS_NEG])
-                + recomp::get_input_analog(controller_input_mappings[(size_t)GameInput::X_AXIS_POS])
-                - recomp::get_input_analog(controller_input_mappings[(size_t)GameInput::X_AXIS_NEG]);
+                - recomp::get_input_analog(keyboard_input_mappings[(size_t)GameInput::X_AXIS_NEG]) + joystick_x;
+
         cur_y = recomp::get_input_analog(keyboard_input_mappings[(size_t)GameInput::Y_AXIS_POS])
-                - recomp::get_input_analog(keyboard_input_mappings[(size_t)GameInput::Y_AXIS_NEG])
-                + recomp::get_input_analog(controller_input_mappings[(size_t)GameInput::Y_AXIS_POS])
-                - recomp::get_input_analog(controller_input_mappings[(size_t)GameInput::Y_AXIS_NEG]);
+                - recomp::get_input_analog(keyboard_input_mappings[(size_t)GameInput::Y_AXIS_NEG]) + joystick_y;
     }
 
     *buttons_out = cur_buttons;
     *x_out = std::clamp(cur_x, -1.0f, 1.0f);
     *y_out = std::clamp(cur_y, -1.0f, 1.0f);
+
+    return true;
 }
