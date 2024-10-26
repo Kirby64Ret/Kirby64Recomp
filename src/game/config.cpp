@@ -1,7 +1,7 @@
 #include "recomp_config.h"
 #include "recomp_input.h"
 #include "recomp_sound.h"
-#include "../../ultramodern/config.hpp"
+#include "ultramodern/config.hpp"
 #include <filesystem>
 #include <fstream>
 #include <iomanip>

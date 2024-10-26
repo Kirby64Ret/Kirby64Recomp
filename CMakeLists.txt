@@ -29,6 +29,8 @@ endif()
 set(RT64_STATIC TRUE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/rt64 ${CMAKE_BINARY_DIR}/rt64)
 
+add_subdirectory(${CMAKE_SOURCE_DIR}/lib/N64ModernRuntime ${CMAKE_BINARY_DIR}/runtime)
+
 # set(BUILD_SHARED_LIBS_SAVED "${BUILD_SHARED_LIBS}")
 set(BUILD_SHARED_LIBS OFF)
 SET(LUNASVG_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -110,37 +112,6 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mm_shader_cache.c ${CMAKE_
 add_executable(Kirby64Recompiled)
 
 set (SOURCES
-    ${CMAKE_SOURCE_DIR}/ultramodern/audio.cpp
-    ${CMAKE_SOURCE_DIR}/ultramodern/events.cpp
-    ${CMAKE_SOURCE_DIR}/ultramodern/mesgqueue.cpp
-    ${CMAKE_SOURCE_DIR}/ultramodern/misc_ultra.cpp
-    ${CMAKE_SOURCE_DIR}/ultramodern/port_main.c
-    ${CMAKE_SOURCE_DIR}/ultramodern/scheduling.cpp
-    ${CMAKE_SOURCE_DIR}/ultramodern/threadqueue.cpp
-    ${CMAKE_SOURCE_DIR}/ultramodern/task_win32.cpp
-    ${CMAKE_SOURCE_DIR}/ultramodern/threads.cpp
-    ${CMAKE_SOURCE_DIR}/ultramodern/timer.cpp
-    ${CMAKE_SOURCE_DIR}/ultramodern/ultrainit.cpp
-    ${CMAKE_SOURCE_DIR}/ultramodern/rt64_layer.cpp
-
-    ${CMAKE_SOURCE_DIR}/src/recomp/ai.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/cont.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/dp.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/eep.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/euc-jp.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/flash.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/math_routines.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/overlays.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/patch_loading.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/pak.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/pi.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/ultra_stubs.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/ultra_translation.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/print.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/recomp.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/sp.cpp
-    ${CMAKE_SOURCE_DIR}/src/recomp/vi.cpp
-
     ${CMAKE_SOURCE_DIR}/src/main/main.cpp
     
     ${CMAKE_SOURCE_DIR}/src/game/input.cpp
@@ -178,6 +149,7 @@ target_include_directories(Kirby64Recompiled PRIVATE
     ${CMAKE_SOURCE_DIR}/lib/rt64/src/render
     ${CMAKE_SOURCE_DIR}/lib/freetype-windows-binaries/include
     ${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/nativefiledialog-extended/src/include
+    ${CMAKE_SOURCE_DIR}/lib/N64ModernRuntime/ultramodern/include/
     ${CMAKE_BINARY_DIR}/shaders
     ${CMAKE_CURRENT_BINARY_DIR}
 )

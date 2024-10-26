@@ -10,8 +10,8 @@
 // #include "../patches/input.h"
 // #include "../patches/graphics.h"
 // #include "../patches/sound.h"
-#include "../ultramodern/ultramodern.hpp"
-#include "../ultramodern/config.hpp"
+#include "ultramodern/ultramodern.hpp"
+#include "ultramodern/config.hpp"
 
 extern "C" void recomp_update_inputs(uint8_t* rdram, recomp_context* ctx) {
     recomp::poll_inputs();

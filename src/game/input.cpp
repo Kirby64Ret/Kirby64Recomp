@@ -1,7 +1,7 @@
 #include <atomic>
 #include <mutex>
 
-#include "../ultramodern/ultramodern.hpp"
+#include "ultramodern/ultramodern.hpp"
 #include "recomp.h"
 #include "recomp_input.h"
 #include "recomp_ui.h"

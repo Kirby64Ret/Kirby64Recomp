@@ -3,7 +3,7 @@
 
 #include <filesystem>
 #include <string_view>
-#include "../ultramodern/config.hpp"
+#include "ultramodern/config.hpp"
 
 namespace recomp {
     constexpr std::u8string_view program_id = u8"Kirby64Recompiled";

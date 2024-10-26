@@ -9,8 +9,8 @@
 
 #include "nfd.h"
 
-#include "../../ultramodern/ultra64.h"
-#include "../../ultramodern/ultramodern.hpp"
+#include "ultramodern/ultra64.h"
+#include "ultramodern/ultramodern.hpp"
 #define SDL_MAIN_HANDLED
 #ifdef _WIN32
 #include "SDL.h"

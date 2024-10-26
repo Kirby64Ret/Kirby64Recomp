@@ -1,8 +1,8 @@
 #ifndef __RT64_LAYER_H__
 #define __RT64_LAYER_H__
 
-#include "../ultramodern/ultramodern.hpp"
-#include "../ultramodern/config.hpp"
+#include "ultramodern/ultramodern.hpp"
+#include "ultramodern/config.hpp"
 
 namespace RT64 {
     struct Application;
