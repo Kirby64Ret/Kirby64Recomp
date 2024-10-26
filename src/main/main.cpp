@@ -333,80 +333,52 @@ std::vector<recomp::GameEntry> supported_games = {
 namespace zelda64 {
     std::string get_game_thread_name(const OSThread* t) {
         std::string name = "[Game] ";
-        name += std::to_string(t->id);
-        // switch (t->id) {
-        //     case 0:
-        //         switch (t->priority) {
-        //             case 150:
-        //                 name += "PIMGR";
-        //                 break;
+        // name += std::to_string(t->id);
+        switch (t->id) {
+            case 0:
+                switch (t->priority) {
+                    case 150:
+                        name += "PIMGR";
+                        break;
 
-        //             case 254:
-        //                 name += "VIMGR";
-        //                 break;
+                    case 254:
+                        name += "VIMGR";
+                        break;
 
-        //             default:
-        //                 name += std::to_string(t->id);
-        //                 break;
-        //         }
-        //         break;
-
-        //     case 1:
-        //         name += "IDLE";
-        //         break;
-
-        //     case 2:
-        //         switch (t->priority) {
-        //             case 5:
-        //                 name += "SLOWLY";
-        //                 break;
-
-        //             case 127:
-        //                 name += "FAULT";
-        //                 break;
-
-        //             default:
-        //                 name += std::to_string(t->id);
-        //                 break;
-        //         }
-        //         break;
-
-        //     case 3:
-        //         name += "MAIN";
-        //         break;
-
-        //     case 4:
-        //         name += "GRAPH";
-        //         break;
-
-        //     case 5:
-        //         name += "SCHED";
-        //         break;
-
-        //     case 7:
-        //         name += "PADMGR";
-        //         break;
-
-        //     case 10:
-        //         name += "AUDIOMGR";
-        //         break;
-
-        //     case 13:
-        //         name += "FLASHROM";
-        //         break;
-
-        //     case 18:
-        //         name += "DMAMGR";
-        //         break;
-
-        //     case 19:
-        //         name += "IRQMGR";
-        //         break;
-
-        //     default:
-        //         name += std::to_string(t->id);
-        //         break;
-        // }
+                    default:
+                        name += std::to_string(t->id);
+                        break;
+                }
+                break;
+            case 1:
+                name += "IDLE";
+                break;
+            case 3:
+                name += "MAIN";
+                break;
+            case 4:
+                name += "AUD";
+                break;
+            case 5:
+                name += "GAMELOOP";
+                break;
+            case 6:
+                name += "CONT";
+                break;
+            case 8:
+                name += "FAULT";
+                break;
+            case 10000000 ... 20000000:
+                name = "[GObjProc] ";
+                name += std::to_string(t->id - 10000000);
+                break;
+            case 100000000:
+                name += "WEIRD";
+                break;
+            default:
+                name += std::to_string(t->id);
+                break;
+        }
 
         return name;
     }
