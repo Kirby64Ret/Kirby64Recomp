@@ -22,7 +22,7 @@ RECOMP_PATCH void func_800B531C(s32 arg0) {
     s32 var_v0;
     u16 var_v0_2;
 
-    recomp_printf("This is a patched func\n");
+    // recomp_printf("This is a patched func\n");
 
     func_800B35F0();
     if (gKirbyState.unk18 == 0) {
