@@ -6,7 +6,6 @@ entrypoint = 0x80000400
 # Paths are relative to the location of this config file.
 elf_path = "NK4E.us.elf"
 output_func_path = "RecompiledFuncs"
-relocatable_sections_path = "NK4E.overlays.txt"
 
 # remove imem/dmem checks
 [[patches.instruction]]
@@ -18,11 +17,71 @@ func = "thread5_game"
 vram = 0x80000644
 value = 0x00000000 # j -> nop
 
-[[patches.func]]
-name = "recomp_ovl_load_hook"
-args = ["u32", "u32", "u32"]
+ignored = [
+    "__osBlockSum",
+    "__osPfsReleasePages",
+    "__osPfsDeclearPage",
+    "osPfsReFormat",
+]
 
 [[patches.hook]]
 func = "dma_overlay_load"
-text = "    recomp_ovl_load_hook(MEM_W(0, ctx->r4), MEM_W(0x8, ctx->r4), (uint32_t)(MEM_W(0x24, ctx->r4) - MEM_W(0x8, ctx->r4)));"
+text = "    load_overlays(MEM_W(0, ctx->r4), MEM_W(0x8, ctx->r4), (uint32_t)(MEM_W(0x4, ctx->r4) - MEM_W(0x0, ctx->r4)));"
 # No after_vram means this will be placed at the start of the function
+
+# yield on a function that spins waiting for the audio thread to set vars
+[[patches.hook]]
+func = "func_800A74B0"
+text = "    yield_self(rdram);"
+before_vram = 0x800A74C0
+
+# an additional yield
+[[patches.hook]]
+func = "func_800A74D8"
+text = "yield_self_1ms(rdram);"
+before_vram = 0x800A7510
+
+# tamper_check_ovl20
+[[patches.instruction]]
+func = "func_80300000"
+vram = 0x803000B4
+value = 0x24020001 # addiu v0, r0, 1
+
+# Changes reading a hardware register into a call to the equivalent libultra function
+[[patches.hook]]
+func = "thread4_audio"
+text = "    osAiGetLength_recomp(rdram, ctx);"
+before_vram = 0x8002013C
+[[patches.instruction]]
+func = "thread4_audio"
+vram = 0x8002013C
+value = 0x00000000 # nop
+[[patches.instruction]]
+func = "thread4_audio"
+vram = 0x80020140
+value = 0x0040C825 # addiu t9, v0, 0
+
+# Changes reading a hardware register into a call to the equivalent libultra function
+[[patches.hook]]
+func = "thread4_audio"
+text = "    osAiGetLength_recomp(rdram, ctx);"
+before_vram = 0x80020804
+[[patches.instruction]]
+func = "thread4_audio"
+vram = 0x80020804
+value = 0x00000000 # nop
+[[patches.instruction]]
+func = "thread4_audio"
+vram = 0x80020808
+value = 0x0040C825 # addiu t9, v0, 0
+
+# skip an uncached memory read that depends on the specific CIC chip
+[[patches.instruction]]
+func = "func_800F88A0"
+vram = 0x800F88A0
+value = 0x03E00008 # jr ra
+# another antipiracy check
+[[patches.instruction]]
+func = "func_800F88A0"
+vram = 0x800F88A4
+value = 0x24020001 # li v0, 1

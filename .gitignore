@@ -8,6 +8,7 @@
 
 # Output C files
 RecompiledFuncs/
+rsp/
 RecompiledPatches/
 
 # Linux build output
