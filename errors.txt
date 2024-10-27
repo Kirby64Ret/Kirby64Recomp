@@ -1,4 +1,0 @@
-func_800306C0
-func_8002F040
-func_8002EF84
-func_80030DF0
