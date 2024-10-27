@@ -1,0 +1,69 @@
+     VMA      LMA     Size Align Out     In      Symbol
+       0        0        0     1 RAMBASE = 0x80801000
+       0        0        0     1 PATCH_RAM_END = 0x81000000
+80801000        0        0    16 .text
+80801000        0        0    16         doublespeed.o:(.text)
+80801000        0      720     4 .recomp_patch
+80801000        0      720     4         doublespeed.o:(.recomp_patch)
+80801000        0      720     1                 func_800B531C
+80801720      720       34     4 .rodata
+80801720      720        c     4         <internal>:(.rodata.cst4)
+8080172c      72c       10     4         <internal>:(.rodata.cst8)
+8080173c      73c       18     1         <internal>:(.rodata.str1.1)
+80801760 80801760        0    16 .data
+80801760 80801760        0    16         doublespeed.o:(.data)
+80801760 80801760        0    16 .bss
+80801760 80801760        0    16         doublespeed.o:(.bss)
+80801760 80801760        0     1 
+       0        0      5d0     4 .symtab
+       0        0      5d0     4         <internal>:(.symtab)
+       0        0      60f     1 .strtab
+       0        0      60f     1         <internal>:(.strtab)
+       0        0       54     1 .shstrtab
+       0        0       54     1         <internal>:(.shstrtab)
+80801760 80801760        0     1 __start = 0x80000000
+80801760 80801760        0     1 recomp_puts = 0x8F000000
+80801760 80801760        0     1 recomp_exit = 0x8F000004
+80801760 80801760        0     1 recomp_handle_quicksave_actions = 0x8F000008
+80801760 80801760        0     1 recomp_handle_quicksave_actions_main = 0x8F00000C
+80801760 80801760        0     1 osRecvMesg_recomp = 0x8F000010
+80801760 80801760        0     1 osSendMesg_recomp = 0x8F000014
+80801760 80801760        0     1 recomp_get_gyro_deltas = 0x8F000018
+80801760 80801760        0     1 recomp_get_aspect_ratio = 0x8F00001C
+80801760 80801760        0     1 recomp_get_pending_warp = 0x8F000020
+80801760 80801760        0     1 recomp_powf = 0x8F000024
+80801760 80801760        0     1 recomp_get_target_framerate = 0x8F000028
+80801760 80801760        0     1 recomp_get_targeting_mode = 0x8F00002C
+80801760 80801760        0     1 recomp_get_bgm_volume = 0x8F000030
+80801760 80801760        0     1 recomp_get_low_health_beeps_enabled = 0x8F000034
+80801760 80801760        0     1 __sinf_recomp = 0x8F000038
+80801760 80801760        0     1 __cosf_recomp = 0x8F00003C
+80801760 80801760        0     1 osCreateMesgQueue_recomp = 0x8F000048
+80801760 80801760        0     1 recomp_set_current_frame_poll_id = 0x8F00004C
+80801760 80801760        0     1 recomp_time_us = 0x8F000050
+80801760 80801760        0     1 recomp_measure_latency = 0x8F000054
+80801760 80801760        0     1 osViGetCurrentFramebuffer_recomp = 0x8F000058
+80801760 80801760        0     1 bzero_recomp = 0x8F00005C
+80801760 80801760        0     1 osFlashWriteArray_recomp = 0x8F000060
+80801760 80801760        0     1 osFlashWriteBuffer_recomp = 0x8F000064
+80801760 80801760        0     1 osWritebackDCache_recomp = 0x8F000068
+80801760 80801760        0     1 recomp_get_pending_set_time = 0x8F00006C
+80801760 80801760        0     1 osContStartReadData_recomp = 0x8F000070
+80801760 80801760        0     1 osContGetReadData_recomp = 0x8F000074
+80801760 80801760        0     1 osContStartQuery_recomp = 0x8F000078
+80801760 80801760        0     1 osContGetQuery_recomp = 0x8F00007C
+80801760 80801760        0     1 recomp_get_mouse_deltas = 0x8F000080
+80801760 80801760        0     1 bcmp_recomp = 0x8F000084
+80801760 80801760        0     1 osGetTime_recomp = 0x8F000088
+80801760 80801760        0     1 recomp_autosave_enabled = 0x8F00008C
+80801760 80801760        0     1 recomp_load_overlays = 0x8F000090
+80801760 80801760        0     1 osInvalICache_recomp = 0x8F000094
+80801760 80801760        0     1 recomp_analog_cam_enabled = 0x8F000098
+80801760 80801760        0     1 recomp_get_camera_inputs = 0x8F00009C
+80801760 80801760        0     1 recomp_set_right_analog_suppressed = 0x8F0000A0
+80801760 80801760        0     1 recomp_get_inverted_axes = 0x8F0000A4
+80801760 80801760        0     1 recomp_high_precision_fb_enabled = 0x8F0000A8
+80801760 80801760        0     1 recomp_get_resolution_scale = 0x8F0000AC
+80801760 80801760        0     1 recomp_get_analog_inverted_axes = 0x8F0000B0
+       0        0      4e0     4 .rel.recomp_patch
+       0        0      4e0     4         doublespeed.o:(.rel.recomp_patch)
