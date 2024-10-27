@@ -4,7 +4,8 @@
 entrypoint_name = "EntryPoint"
 entrypoint = 0x80000400
 # Paths are relative to the location of this config file.
-elf_path = "NK4E.us.elf"
+rom_file_path = "NK4E.z64"
+symbols_file_path = "Kirby64Syms/NK4E.syms.toml"
 output_func_path = "RecompiledFuncs"
 
 # remove imem/dmem checks

@@ -1,9 +1,6 @@
 default: all
 
-
-DECOMP := ~/Decomps/kirby64
 N64RECOMP := ~/Devel/N64Recomp
-
 
 all: build/Kirby64Recompiled
 
