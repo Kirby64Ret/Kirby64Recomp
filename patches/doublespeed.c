@@ -6,6 +6,8 @@ extern void func_800F8C70(GObj *g);
 extern void func_800F8E6C(GObj *g);
 extern void func_80112A40(s32, Vector*, Vector*);
 
+#define SPEEDCHANGE (4.0f)
+
 RECOMP_PATCH void func_800B531C(s32 arg0) {
     Vector sp64;
     f32 sp58;
@@ -41,7 +43,7 @@ RECOMP_PATCH void func_800B531C(s32 arg0) {
         D_800E6850[D_8004A7C4->objId] = 0.0f;
         sp58 = 0.0f;
     } else if (D_800D6B54 == 0) {
-        D_800E64D0[D_8004A7C4->objId] = 16 * (D_800E5510[D_8004A7C4->objId] + sp58 + sp54);
+        D_800E64D0[D_8004A7C4->objId] = SPEEDCHANGE * (D_800E5510[D_8004A7C4->objId] + sp58 + sp54);
         if (gKirbyState.unk160 == 0) {
             if (gKirbyState.unk164 != 0) {
                 if (D_800E8920[D_8004A7C4->objId] != 0) {
@@ -65,7 +67,7 @@ RECOMP_PATCH void func_800B531C(s32 arg0) {
                             gKirbyState.unk164 = 0.0f;
                         }
                     }
-                    D_800E64D0[D_8004A7C4->objId] += 8*(gKirbyState.unk164);
+                    D_800E64D0[D_8004A7C4->objId] += gKirbyState.unk164;
                 }
             }
             if (gKirbyState.unk168 != 0.0f) {
@@ -96,7 +98,7 @@ RECOMP_PATCH void func_800B531C(s32 arg0) {
     gKirbyState.unk170 = D_800E5F90[D_8004A7C4->objId];
     func_800F8E6C(D_800DE350[D_8004A7C4->objId]);
     func_800F8C70(D_800DE350[D_8004A7C4->objId]);
-    D_800E64D0[D_8004A7C4->objId] = sp58 * 8;
+    D_800E64D0[D_8004A7C4->objId] = sp58;
     func_800B46F8();
     if (D_800D6B54 == 0) {
         D_800E3210[D_8004A7C4->objId] += (D_800E5C10[D_8004A7C4->objId] + sp50);

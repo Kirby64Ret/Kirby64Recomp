@@ -10,6 +10,8 @@
 RecompiledFuncs/
 rsp/
 RecompiledPatches/
+patches/*.d
+patches/*.bin
 
 # Linux build output
 build/
