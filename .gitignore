@@ -1,5 +1,6 @@
 # VSCode file settings
 .vscode/settings.json
+.vscode/launch.json
 .vscode/c_cpp_properties.json
 
 # Input elf and rom files
@@ -12,6 +13,7 @@ rsp/
 RecompiledPatches/
 patches/*.d
 patches/*.bin
+patches/*.map
 
 # Linux build output
 build/
@@ -54,7 +56,7 @@ vcpkg_installed/
 # Runtime files
 imgui.ini
 rt64.log
-
+*.txt
 node_modules/
 
 # Recompiler Linux binary
