@@ -16,3 +16,4 @@
 [submodule "lib/N64ModernRuntime"]
 	path = lib/N64ModernRuntime
 	url = https://github.com/N64Recomp/N64ModernRuntime/
+	branch = misc-fixes
