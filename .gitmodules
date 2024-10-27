@@ -14,3 +14,6 @@
 	path = lib/N64ModernRuntime
 	url = https://github.com/N64Recomp/N64ModernRuntime/
 	branch = misc-fixes
+[submodule "Kirby64Syms"]
+	path = Kirby64Syms
+	url = https://github.com/Kirby64Ret/Kirby64Syms
