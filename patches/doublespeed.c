@@ -5,6 +5,8 @@ extern void func_8011DD5C(f32 *a, f32 *b);
 extern void func_800F8C70(GObj *g);
 extern void func_800F8E6C(GObj *g);
 extern void func_80112A40(s32, Vector*, Vector*);
+extern s32 change_kirby_hp(f32);
+extern u8 ovl1_TamperCheck(void);
 
 #define SPEEDCHANGE (4.0f)
 
@@ -142,5 +144,6 @@ RECOMP_PATCH void func_800B531C(s32 arg0) {
         gKirbyState.unk160 = 0;
         gKirbyState.unk164 = gKirbyState.unk168;
     }
+    change_kirby_hp(6.0f);
 }
 
