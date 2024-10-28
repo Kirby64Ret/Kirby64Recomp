@@ -30,7 +30,7 @@ constexpr auto rr_default             = ultramodern::renderer::RefreshRate::Disp
 constexpr auto hpfb_default           = ultramodern::renderer::HighPrecisionFramebuffer::Off;
 constexpr int ds_default              = 1;
 constexpr int rr_manual_default       = 60;
-constexpr bool developer_mode_default = false;
+constexpr bool developer_mode_default = true;
 
 static bool is_steam_deck = false;
 

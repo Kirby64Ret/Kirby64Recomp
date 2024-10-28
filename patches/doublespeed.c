@@ -8,7 +8,17 @@ extern void func_80112A40(s32, Vector*, Vector*);
 extern s32 change_kirby_hp(f32);
 extern u8 ovl1_TamperCheck(void);
 
-#define SPEEDCHANGE (4.0f)
+#define SPEEDCHANGE (2.0f)
+
+s32 get_stickX() {
+    return gControllers[0].stick_x;
+}
+
+f32 get_speed_change() {
+    s32 x = get_stickX();
+    if (ABSVAL(x) < 10) x = 0;
+    return SPEEDCHANGE * ((f32)ABSVAL(x) / 80.0f);
+}
 
 RECOMP_PATCH void func_800B531C(s32 arg0) {
     Vector sp64;
@@ -45,7 +55,7 @@ RECOMP_PATCH void func_800B531C(s32 arg0) {
         D_800E6850[D_8004A7C4->objId] = 0.0f;
         sp58 = 0.0f;
     } else if (D_800D6B54 == 0) {
-        D_800E64D0[D_8004A7C4->objId] = SPEEDCHANGE * (D_800E5510[D_8004A7C4->objId] + sp58 + sp54);
+        D_800E64D0[D_8004A7C4->objId] = get_speed_change() * (D_800E5510[D_8004A7C4->objId] + sp58 + sp54);
         if (gKirbyState.unk160 == 0) {
             if (gKirbyState.unk164 != 0) {
                 if (D_800E8920[D_8004A7C4->objId] != 0) {

@@ -19,6 +19,8 @@ typedef double f64;
 typedef s32 OSPri;
 typedef s32 OSId;
 
+#define ABSVAL(x) ((x) < 0 ? -(x) : (x))
+
 typedef float Vec3f[3];
 
 
@@ -618,6 +620,26 @@ typedef u32 OSYieldResult;
         osSpTaskLoad((tp)); \
         osSpTaskStartGo((tp));  \
     }
+
+struct Controller {
+    u16 buttonHeld;
+    u16 buttonPressed;
+    u16 bufferedButtonPressed;
+    u16 buttonHeldLong;
+    u16 bufferedButtonHeldLong;
+    u16 buttonReleased;
+    u16 bufferedButtonReleased;
+    s8 stick_x;
+    s8 stick_y;
+    s32 unk10;
+    s32 unk14;
+    s32 unk18;
+    u8 errno;
+    u8 status;
+};
+
+extern struct Controller gControllers[4]; // 0x80048EA0
+
 
 void osSpTaskLoad(OSTask *task);
 void osSpTaskLoad(OSTask *task);

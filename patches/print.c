@@ -21,3 +21,22 @@ int recomp_printf(const char* fmt, ...) {
 
     return ret;
 }
+
+RECOMP_PATCH void fatal_printf(const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+
+    recomp_printf(fmt, args);
+
+    va_end(args);
+}
+
+RECOMP_PATCH void print_error_stub(const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+
+    recomp_printf(fmt, args);
+
+    va_end(args);
+}
+
