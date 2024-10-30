@@ -8,7 +8,7 @@ extern void func_80112A40(s32, Vector*, Vector*);
 extern s32 change_kirby_hp(f32);
 extern u8 ovl1_TamperCheck(void);
 
-#define SPEEDCHANGE (2.0f)
+#define SPEEDCHANGE (1.0f)
 
 s32 get_stickX() {
     return gControllers[0].stick_x;

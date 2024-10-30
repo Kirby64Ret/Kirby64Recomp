@@ -16,6 +16,8 @@
 #include "buttons.h"
 
 #define MAXCONTROLLERS 4
+// Converts stick inputs to a button press
+// (Use this until a better hook is found for the analog adjustment patch)
 extern "C" void handle_analog_input(uint8_t* rdram, recomp_context* ctx) {
     PTR(OSContPad) conts = _arg<0, PTR(OSContPad)>(rdram, ctx);
 
