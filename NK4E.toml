@@ -86,3 +86,12 @@ value = 0x03E00008 # jr ra
 func = "func_800F88A0"
 vram = 0x800F88A4
 value = 0x24020001 # li v0, 1
+
+
+###################  (Enhancements)  ###################
+
+# Handle analog stick input
+[[patches.hook]]
+func = "read_controller_input"
+text = "    handle_analog_input(rdram, ctx);"
+before_vram = 0x80004030

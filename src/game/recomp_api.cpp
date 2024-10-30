@@ -13,6 +13,30 @@
 // #include "../patches/sound.h"
 #include "ultramodern/ultramodern.hpp"
 #include "ultramodern/config.hpp"
+#include "buttons.h"
+
+#define MAXCONTROLLERS 4
+extern "C" void handle_analog_input(uint8_t* rdram, recomp_context* ctx) {
+    PTR(OSContPad) conts = _arg<0, PTR(OSContPad)>(rdram, ctx);
+
+    OSContPad data[MAXCONTROLLERS];
+    osContGetReadData(data);
+
+    for (int controller = 0; controller < MAXCONTROLLERS; controller++) {
+        if (data[controller].stick_x > 10) {
+            MEM_H(6 * controller + 0, conts) |= R_JPAD;
+        }
+        if (data[controller].stick_x < -10) {
+            MEM_H(6 * controller + 0, conts) |= L_JPAD;
+        }
+        if (data[controller].stick_y > 20) {
+            MEM_H(6 * controller + 0, conts) |= U_JPAD;
+        }
+        if (data[controller].stick_y < -50) {
+            MEM_H(6 * controller + 0, conts) |= D_JPAD;
+        }
+    }
+}
 
 extern "C" void recomp_update_inputs(uint8_t* rdram, recomp_context* ctx) {
     recomp::poll_inputs();

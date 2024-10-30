@@ -16,7 +16,7 @@ s32 get_stickX() {
 
 f32 get_speed_change() {
     s32 x = get_stickX();
-    if (ABSVAL(x) < 10) x = 0;
+    if (ABSVAL(x) < 10) return SPEEDCHANGE;
     return SPEEDCHANGE * ((f32)ABSVAL(x) / 80.0f);
 }
 
