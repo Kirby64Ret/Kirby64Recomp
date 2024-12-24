@@ -17,3 +17,6 @@
 [submodule "Kirby64Syms"]
 	path = Kirby64Syms
 	url = https://github.com/Kirby64Ret/Kirby64Syms
+[submodule "N64Recomp"]
+	path = N64Recomp
+	url = https://github.com/N64Recomp/N64Recomp

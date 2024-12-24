@@ -327,6 +327,14 @@ std::vector<recomp::GameEntry> supported_games = {
         .entrypoint_address = get_entrypoint_address(),
         .entrypoint = recomp_entrypoint,
     },
+    // { // compatibility with gamemasterplc's widescreen patch
+    //     .rom_hash = 0x5748DED32F4ABA86ULL,
+    //     .internal_name = "Kirby64             ",
+    //     .game_id = u8"NK4E.us",
+    //     .is_enabled = true,
+    //     .entrypoint_address = get_entrypoint_address(),
+    //     .entrypoint = recomp_entrypoint,
+    // },
 };
 
 // TODO: move somewhere else

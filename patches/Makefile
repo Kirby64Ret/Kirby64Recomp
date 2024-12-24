@@ -4,10 +4,11 @@ CC      ?= clang
 LD      ?= ld.lld
 
 DECOMP := ~/Decomps/kirby64
-DECOMP_INCS := -I $(DECOMP)/include -I $(DECOMP)/include/libc -I $(DECOMP)/src -I $(DECOMP)/assets -I../lib/rt64/include
+LIBULTRA_INC := $(DECOMP)/libreultra/include/2.0I
+DECOMP_INCS := -I $(LIBULTRA_INC) -I $(LIBULTRA_INC)/PR -I $(DECOMP)/include -I $(DECOMP)/include/libc -I $(DECOMP)/src -I $(DECOMP)/assets -I../lib/rt64/include
 
 
-CFLAGS   := -target mips -mips2 -mabi=32 -O2 -G0 -mno-abicalls -mno-odd-spreg -mno-check-zero-division \
+CFLAGS   := $(DECOMP_INCS) -target mips -mips2 -mabi=32 -O2 -G0 -mno-abicalls -mno-odd-spreg -mno-check-zero-division \
 			-fomit-frame-pointer -ffast-math -fno-unsafe-math-optimizations -fno-builtin-memset \
 			-Wall -Wextra -Wno-incompatible-library-redeclaration -Wno-unused-parameter -Wno-unknown-pragmas -Wno-unused-variable -Wno-missing-braces -Wno-unsupported-floating-point-opt
 CPPFLAGS := -nostdinc -Wno-incompatible-function-pointer-types -D_LANGUAGE_C -DTARGET_N64 -DMIPS -I dummy_headers $(DECOMP_INCS)
