@@ -9,8 +9,6 @@ Special thanks to Wiseguy for dealing with the runtime fixes to support this gam
 
 ## Instructions
 - Clone this repo recursively (this folder should be about 1.1GB of stuff)
-- Build [N64Recomp](https://github.com/Kirby64Ret/N64Recomp)
-- Back in this repo, set the `N64RECOMP` variable in the `Makefile` to the above repo
 - Place your copy of Kirby 64 in here and name it `NK4E.z64`
 - Run `make`
 - wait
