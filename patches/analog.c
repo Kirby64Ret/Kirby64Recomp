@@ -154,6 +154,6 @@ RECOMP_PATCH void func_800B531C(s32 arg0) {
         gKirbyState.unk160 = 0;
         gKirbyState.unk164 = gKirbyState.unk168;
     }
-    change_kirby_hp(6.0f);
+    //change_kirby_hp(6.0f);
 }
 
