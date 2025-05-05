@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include "librecomp/recomp.h"
+#include "recomp.h"
 #include "librecomp/overlays.hpp"
 #include "zelda_config.h"
 #include "recomp_input.h"
@@ -13,32 +13,6 @@
 // #include "../patches/sound.h"
 #include "ultramodern/ultramodern.hpp"
 #include "ultramodern/config.hpp"
-#include "buttons.h"
-
-#define MAXCONTROLLERS 4
-// Converts stick inputs to a button press
-// (Use this until a better hook is found for the analog adjustment patch)
-extern "C" void handle_analog_input(uint8_t* rdram, recomp_context* ctx) {
-    PTR(OSContPad) conts = _arg<0, PTR(OSContPad)>(rdram, ctx);
-
-    OSContPad data[MAXCONTROLLERS];
-    osContGetReadData(data);
-
-    for (int controller = 0; controller < MAXCONTROLLERS; controller++) {
-        if (data[controller].stick_x > 10) {
-            MEM_H(6 * controller + 0, conts) |= R_JPAD;
-        }
-        if (data[controller].stick_x < -10) {
-            MEM_H(6 * controller + 0, conts) |= L_JPAD;
-        }
-        if (data[controller].stick_y > 20) {
-            MEM_H(6 * controller + 0, conts) |= U_JPAD;
-        }
-        if (data[controller].stick_y < -50) {
-            MEM_H(6 * controller + 0, conts) |= D_JPAD;
-        }
-    }
-}
 
 extern "C" void recomp_update_inputs(uint8_t* rdram, recomp_context* ctx) {
     recomp::poll_inputs();
@@ -84,7 +58,18 @@ extern "C" void recomp_get_target_framerate(uint8_t* rdram, recomp_context* ctx)
     _return(ctx, ultramodern::get_target_framerate(60 / frame_divisor));
 }
 
-extern "C" void recomp_get_aspect_ratio(uint8_t* rdram, recomp_context* ctx) {
+extern "C" void recomp_get_window_resolution(uint8_t* rdram, recomp_context* ctx) {
+    int width, height;
+    recompui::get_window_size(width, height);
+
+    gpr width_out = _arg<0, PTR(u32)>(rdram, ctx);
+    gpr height_out = _arg<1, PTR(u32)>(rdram, ctx);
+
+    MEM_W(0, width_out) = (u32)width;
+    MEM_W(0, height_out) = (u32)height;
+}
+
+extern "C" void recomp_get_target_aspect_ratio(uint8_t* rdram, recomp_context* ctx) {
     ultramodern::renderer::GraphicsConfig graphics_config = ultramodern::renderer::get_graphics_config();
     float original = _arg<0, float>(rdram, ctx);
     int width, height;
@@ -117,7 +102,7 @@ extern "C" void recomp_time_us(uint8_t* rdram, recomp_context* ctx) {
     _return(ctx, static_cast<u32>(std::chrono::duration_cast<std::chrono::microseconds>(ultramodern::time_since_start()).count()));
 }
 
-extern "C" void recomp_autosave_enabled(uint8_t* rdram, recomp_context* ctx) {
+extern "C" void recomp_get_autosave_enabled(uint8_t* rdram, recomp_context* ctx) {
     _return(ctx, static_cast<s32>(zelda64::get_autosave_mode() == zelda64::AutosaveMode::On));
 }
 
@@ -157,7 +142,7 @@ extern "C" void recomp_get_analog_inverted_axes(uint8_t* rdram, recomp_context* 
     *y_out = (mode == zelda64::CameraInvertMode::InvertY || mode == zelda64::CameraInvertMode::InvertBoth);
 }
 
-extern "C" void recomp_analog_cam_enabled(uint8_t* rdram, recomp_context* ctx) {
+extern "C" void recomp_get_analog_cam_enabled(uint8_t* rdram, recomp_context* ctx) {
     _return<s32>(ctx, zelda64::get_analog_cam_mode() == zelda64::AnalogCamMode::On);
 }
 

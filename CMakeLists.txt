@@ -7,6 +7,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
+option(RT64_SDL_WINDOW_VULKAN "Build RT64 to expect an SDL Window outside of Windows" ON)
+
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything /W4")
 endif()
@@ -58,6 +60,7 @@ target_include_directories(RecompiledFuncs PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/lib/N64ModernRuntime/ultramodern/include
     ${CMAKE_SOURCE_DIR}/lib/N64ModernRuntime/librecomp/include
+    ${CMAKE_SOURCE_DIR}/N64Recomp/include
 )
 
 file(GLOB FUNC_C_SOURCES ${CMAKE_SOURCE_DIR}/RecompiledFuncs/*.c)
@@ -79,6 +82,7 @@ target_include_directories(PatchesLib PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/lib/N64ModernRuntime/ultramodern/include
     ${CMAKE_SOURCE_DIR}/lib/N64ModernRuntime/librecomp/include
+    ${CMAKE_SOURCE_DIR}/N64Recomp/include
 )
 
 target_sources(PatchesLib PRIVATE
@@ -120,7 +124,7 @@ add_custom_command(OUTPUT
                        ${CMAKE_SOURCE_DIR}/RecompiledPatches/recomp_overlays.inl
                        ${CMAKE_SOURCE_DIR}/RecompiledPatches/funcs.h
                    # TODO: Look into why modifying patches requires two builds to take
-                   COMMAND ./N64Recomp patches.toml
+                   COMMAND ${CMAKE_BINARY_DIR}/N64Recomp/N64Recomp patches.toml
                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                    DEPENDS ${CMAKE_SOURCE_DIR}/patches/patches.elf
 )
@@ -139,8 +143,19 @@ add_custom_target(DownloadGameControllerDB
 add_executable(Kirby64Recompiled)
 add_dependencies(Kirby64Recompiled DownloadGameControllerDB)
 
+add_compile_definitions(
+    HLSL_CPU
+    FFX_GCC
+    IMGUI_IMPL_VULKAN_NO_PROTOTYPES
+)
+
+if (CMAKE_SYSTEM_NAME MATCHES "Linux" AND RT64_SDL_WINDOW_VULKAN)
+    add_compile_definitions("RT64_SDL_WINDOW_VULKAN")
+endif()
+
 set (SOURCES
     ${CMAKE_SOURCE_DIR}/src/main/main.cpp
+    ${CMAKE_SOURCE_DIR}/src/main/support.cpp
     ${CMAKE_SOURCE_DIR}/src/main/register_overlays.cpp
     ${CMAKE_SOURCE_DIR}/src/main/register_patches.cpp
     ${CMAKE_SOURCE_DIR}/src/main/rt64_render_context.cpp
@@ -152,13 +167,40 @@ set (SOURCES
     ${CMAKE_SOURCE_DIR}/src/game/debug.cpp
     ${CMAKE_SOURCE_DIR}/src/game/quicksaving.cpp
     ${CMAKE_SOURCE_DIR}/src/game/recomp_api.cpp
+    # ${CMAKE_SOURCE_DIR}/src/game/recomp_actor_api.cpp
+    # ${CMAKE_SOURCE_DIR}/src/game/recomp_data_api.cpp
 
     ${CMAKE_SOURCE_DIR}/src/ui/ui_renderer.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/ui_state.cpp
     ${CMAKE_SOURCE_DIR}/src/ui/ui_launcher.cpp
     ${CMAKE_SOURCE_DIR}/src/ui/ui_config.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/ui_prompt.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/ui_config_sub_menu.cpp
     ${CMAKE_SOURCE_DIR}/src/ui/ui_color_hack.cpp
     ${CMAKE_SOURCE_DIR}/src/ui/ui_rml_hacks.cpp
-
+    ${CMAKE_SOURCE_DIR}/src/ui/ui_elements.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/ui_mod_details_panel.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/ui_mod_installer.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/ui_mod_menu.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/ui_api.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/ui_api_events.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/ui_api_images.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/ui_utils.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/util/hsv.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/core/ui_context.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_button.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_clickable.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_container.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_element.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_image.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_label.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_radio.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_scroll_container.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_slider.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_span.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_style.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_text_input.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_toggle.cpp
     ${CMAKE_SOURCE_DIR}/rsp/n_aspMain.cpp
 
     ${CMAKE_SOURCE_DIR}/lib/RmlUi/Backends/RmlUi_Platform_SDL.cpp
@@ -179,7 +221,9 @@ target_include_directories(Kirby64Recompiled PRIVATE
     ${CMAKE_SOURCE_DIR}/lib/sse2neon
     ${CMAKE_SOURCE_DIR}/lib/freetype-windows-binaries/include
     ${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/nativefiledialog-extended/src/include
+    ${CMAKE_SOURCE_DIR}/lib/slot_map/slot_map
     ${CMAKE_BINARY_DIR}/shaders
+    ${CMAKE_SOURCE_DIR}/N64Recomp/include
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -314,9 +358,14 @@ else()
     if (APPLE)
         # Apple's binary is universal, so it'll work on both x86_64 and arm64
         set (DXC "DYLD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/lib/rt64/src/contrib/dxc/lib/arm64" "${PROJECT_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/arm64/dxc-macos")
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|amd64|AMD64")
+            set(SPIRVCROSS "DYLD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/lib/rt64/src/contrib/spirv-cross/lib/x64" "${PROJECT_SOURCE_DIR}/lib/rt64//src/contrib/spirv-cross/bin/x64/spirv-cross")
+        else()
+            set(SPIRVCROSS "DYLD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/lib/rt64/src/contrib/spirv-cross/lib/arm64" "${PROJECT_SOURCE_DIR}/lib/rt64//src/contrib/spirv-cross/bin/x64/spirv-cross")
+        endif()
     else()
         if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|amd64|AMD64")
-            set (DXC "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/lib/rt64/src/contrib/dxc/lib/x64" "${PROJECT_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/x64/dxc")
+            set (DXC "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/lib/rt64/src/contrib/dxc/lib/x64" "${PROJECT_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/x64/dxc-linux")
         else()
             set (DXC "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/lib/rt64/src/contrib/dxc/lib/arm64" "${PROJECT_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/arm64/dxc-linux")
         endif()
