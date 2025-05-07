@@ -3,6 +3,9 @@
 .vscode/launch.json
 .vscode/c_cpp_properties.json
 
+# CLion file settings
+.idea/*
+
 # Input elf and rom files
 *.elf
 *.z64
