@@ -14,6 +14,7 @@ Special thanks to Wiseguy for dealing with the runtime fixes to support this gam
 - Clone this repo recursively (this folder should be about 1.1GB of stuff)
 - Place your copy of Kirby 64 in here and name it `NK4E.z64`
 - See the Clang Info section below.
+- In `patches/Makefile`, set the `DECOMP` variable to a valid Kirby 64 Decomp repo.
 - Run `make`
 - wait
 - wait some more
