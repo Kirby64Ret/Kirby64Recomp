@@ -221,7 +221,7 @@ target_include_directories(Kirby64Recompiled PRIVATE
     ${CMAKE_SOURCE_DIR}/lib/sse2neon
     ${CMAKE_SOURCE_DIR}/lib/freetype-windows-binaries/include
     ${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/nativefiledialog-extended/src/include
-    ${CMAKE_SOURCE_DIR}/lib/slot_map/slot_map
+    ${CMAKE_SOURCE_DIR}/lib/SlotMap
     ${CMAKE_BINARY_DIR}/shaders
     ${CMAKE_SOURCE_DIR}/N64Recomp/include
     ${CMAKE_CURRENT_BINARY_DIR}

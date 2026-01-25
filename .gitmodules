@@ -20,6 +20,3 @@
 [submodule "N64Recomp"]
 	path = N64Recomp
 	url = https://github.com/N64Recomp/N64Recomp
-[submodule "lib/slot_map"]
-	path = lib/slot_map
-	url = https://github.com/SergeyMakeev/slot_map

@@ -87,4 +87,6 @@ float recomp_powf(float, float);
 
 void recomp_crash(const char* err);
 
+#define omCurrentObj D_8004A7C4
+
 #endif
