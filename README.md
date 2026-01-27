@@ -22,7 +22,7 @@ Special thanks to Wiseguy for dealing with the runtime fixes to support this gam
 - Give it your copy of Kirby 64 and select Start Game
 
 ## Clang Info
-This repo was tested to build and run on clang version 18, which is now outdated on some bleeding edge distros (like Arch/Endeavour/Bazzite/etc). For Arch-based distros, you can still install the `clang18` package at the time of reading and this repo will just work.
+This repo was tested to build and run on clang version 18, which is now outdated on some bleeding edge distros (like Arch/Endeavour/etc). For Arch-based distros, you can still install the `clang18` package at the time of reading and this repo will just work.
 
 In the case that other distros install clang to a different location:
 - Run `ls /usr/lib/llvm18/bin` in your terminal.
