@@ -7,9 +7,6 @@
 [submodule "lib/freetype-windows-binaries"]
 	path = lib/freetype-windows-binaries
 	url = https://github.com/ubawurinna/freetype-windows-binaries
-[submodule "lib/mm-decomp"]
-	path = lib/mm-decomp
-	url = https://github.com/zeldaret/mm
 [submodule "lib/lunasvg"]
 	path = lib/lunasvg
 	url = https://github.com/sammycage/lunasvg
@@ -22,3 +19,6 @@
 [submodule "Kirby64Syms"]
 	path = Kirby64Syms
 	url = https://github.com/Kirby64Ret/Kirby64Syms
+[submodule "lib/kirby64"]
+	path = lib/kirby64
+	url = https://github.com/Kirby64Ret/kirby64
