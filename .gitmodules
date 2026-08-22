@@ -16,7 +16,9 @@
 [submodule "lib/N64ModernRuntime"]
 	path = lib/N64ModernRuntime
 	url = https://github.com/N64Recomp/N64ModernRuntime.git
-[submodule "Zelda64RecompSyms"]
-	path = Zelda64RecompSyms
-	url = https://github.com/Zelda64Recomp/Zelda64RecompSyms
-
+[submodule "N64Recomp"]
+	path = N64Recomp
+	url = https://github.com/Kirby64Ret/N64Recomp/
+[submodule "Kirby64Syms"]
+	path = Kirby64Syms
+	url = https://github.com/Kirby64Ret/Kirby64Syms
