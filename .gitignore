@@ -12,6 +12,9 @@
 RecompiledFuncs/
 RecompiledPatches/
 
+# rsp files
+rsp/n_aspMain.cpp
+
 # Linux build output
 build*/
 *.o

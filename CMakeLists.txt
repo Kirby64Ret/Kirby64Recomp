@@ -197,8 +197,7 @@ set (SOURCES
     ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_text_input.cpp
     ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_toggle.cpp
 
-    ${CMAKE_SOURCE_DIR}/rsp/aspMain.cpp
-    ${CMAKE_SOURCE_DIR}/rsp/njpgdspMain.cpp
+    ${CMAKE_SOURCE_DIR}/rsp/n_aspMain.cpp
 
     ${CMAKE_SOURCE_DIR}/lib/RmlUi/Backends/RmlUi_Platform_SDL.cpp
 )
