@@ -56,21 +56,6 @@ unsigned int DPC_BUFBUSY_REG = 0;
 unsigned int DPC_PIPEBUSY_REG = 0;
 unsigned int DPC_TMEM_REG = 0;
 
-unsigned int VI_STATUS_REG = 0;
-unsigned int VI_ORIGIN_REG = 0;
-unsigned int VI_WIDTH_REG = 0;
-unsigned int VI_INTR_REG = 0;
-unsigned int VI_V_CURRENT_LINE_REG = 0;
-unsigned int VI_TIMING_REG = 0;
-unsigned int VI_V_SYNC_REG = 0;
-unsigned int VI_H_SYNC_REG = 0;
-unsigned int VI_LEAP_REG = 0;
-unsigned int VI_H_START_REG = 0;
-unsigned int VI_V_START_REG = 0;
-unsigned int VI_V_BURST_REG = 0;
-unsigned int VI_X_SCALE_REG = 0;
-unsigned int VI_Y_SCALE_REG = 0;
-
 void dummy_check_interrupts() {}
 
 RT64::UserConfiguration::Antialiasing compute_max_supported_aa(RT64::RenderSampleCounts bits) {
@@ -250,20 +235,22 @@ zelda64::renderer::RT64Context::RT64Context(uint8_t* rdram, ultramodern::rendere
     appCore.DPC_PIPEBUSY_REG = &DPC_PIPEBUSY_REG;
     appCore.DPC_TMEM_REG = &DPC_TMEM_REG;
 
-    appCore.VI_STATUS_REG = &VI_STATUS_REG;
-    appCore.VI_ORIGIN_REG = &VI_ORIGIN_REG;
-    appCore.VI_WIDTH_REG = &VI_WIDTH_REG;
-    appCore.VI_INTR_REG = &VI_INTR_REG;
-    appCore.VI_V_CURRENT_LINE_REG = &VI_V_CURRENT_LINE_REG;
-    appCore.VI_TIMING_REG = &VI_TIMING_REG;
-    appCore.VI_V_SYNC_REG = &VI_V_SYNC_REG;
-    appCore.VI_H_SYNC_REG = &VI_H_SYNC_REG;
-    appCore.VI_LEAP_REG = &VI_LEAP_REG;
-    appCore.VI_H_START_REG = &VI_H_START_REG;
-    appCore.VI_V_START_REG = &VI_V_START_REG;
-    appCore.VI_V_BURST_REG = &VI_V_BURST_REG;
-    appCore.VI_X_SCALE_REG = &VI_X_SCALE_REG;
-    appCore.VI_Y_SCALE_REG = &VI_Y_SCALE_REG;
+    ultramodern::renderer::ViRegs* vi_regs = ultramodern::renderer::get_vi_regs();
+
+    appCore.VI_STATUS_REG = &vi_regs->VI_STATUS_REG;
+    appCore.VI_ORIGIN_REG = &vi_regs->VI_ORIGIN_REG;
+    appCore.VI_WIDTH_REG = &vi_regs->VI_WIDTH_REG;
+    appCore.VI_INTR_REG = &vi_regs->VI_INTR_REG;
+    appCore.VI_V_CURRENT_LINE_REG = &vi_regs->VI_V_CURRENT_LINE_REG;
+    appCore.VI_TIMING_REG = &vi_regs->VI_TIMING_REG;
+    appCore.VI_V_SYNC_REG = &vi_regs->VI_V_SYNC_REG;
+    appCore.VI_H_SYNC_REG = &vi_regs->VI_H_SYNC_REG;
+    appCore.VI_LEAP_REG = &vi_regs->VI_LEAP_REG;
+    appCore.VI_H_START_REG = &vi_regs->VI_H_START_REG;
+    appCore.VI_V_START_REG = &vi_regs->VI_V_START_REG;
+    appCore.VI_V_BURST_REG = &vi_regs->VI_V_BURST_REG;
+    appCore.VI_X_SCALE_REG = &vi_regs->VI_X_SCALE_REG;
+    appCore.VI_Y_SCALE_REG = &vi_regs->VI_Y_SCALE_REG;
 
     // Set up the RT64 application configuration fields.
     RT64::ApplicationConfiguration appConfig;
@@ -338,9 +325,11 @@ void zelda64::renderer::RT64Context::send_dl(const OSTask* task) {
     app->processDisplayLists(app->core.RDRAM, task->t.data_ptr & 0x3FFFFFF, 0, true);
 }
 
-void zelda64::renderer::RT64Context::update_screen(uint32_t vi_origin) {
-    VI_ORIGIN_REG = vi_origin;
+void zelda64::renderer::RT64Context::send_dummy_workload(uint32_t fb_address) {
+    // idk lol
+}
 
+void zelda64::renderer::RT64Context::update_screen() {
     app->updateScreen();
 }
 
@@ -482,13 +471,13 @@ void zelda64::renderer::enable_texture_pack(const recomp::mods::ModContext& cont
     texture_pack_action_queue.enqueue(TexturePackEnableAction{mod.manifest.mod_id});
 
     // Check for the texture pack enabled config option.
-    const recomp::mods::ConfigSchema& config_schema = context.get_mod_config_schema(mod.manifest.mod_id);
+    const recomp::config::ConfigSchema& config_schema = context.get_mod_config_schema(mod.manifest.mod_id);
     auto find_it = config_schema.options_by_id.find(zelda64::renderer::special_option_texture_pack_enabled);
     if (find_it != config_schema.options_by_id.end()) {
-        const recomp::mods::ConfigOption& config_option = config_schema.options[find_it->second];
+        const recomp::config::ConfigOption& config_option = config_schema.options[find_it->second];
 
         if (is_texture_pack_enable_config_option(config_option, false)) {
-            recomp::mods::ConfigValueVariant value_variant = context.get_mod_config_value(mod.manifest.mod_id, config_option.id);
+            recomp::config::ConfigValueVariant value_variant = context.get_mod_config_value(mod.manifest.mod_id, config_option.id);
             uint32_t value;
             if (uint32_t* value_ptr = std::get_if<uint32_t>(&value_variant)) {
                 value = *value_ptr;
@@ -522,16 +511,16 @@ void zelda64::renderer::secondary_disable_texture_pack(const std::string& mod_id
 
 // HD texture enable option. Must be an enum with two options.
 // The first option is treated as disabled and the second option is treated as enabled.
-bool zelda64::renderer::is_texture_pack_enable_config_option(const recomp::mods::ConfigOption& option, bool show_errors) {
+bool zelda64::renderer::is_texture_pack_enable_config_option(const recomp::config::ConfigOption& option, bool show_errors) {
     if (option.id == zelda64::renderer::special_option_texture_pack_enabled) {
-        if (option.type != recomp::mods::ConfigOptionType::Enum) {
+        if (option.type != recomp::config::ConfigOptionType::Enum) {
             if (show_errors) {
                 recompui::message_box(("Mod has the special config option id for enabling an HD texture pack (\"" + zelda64::renderer::special_option_texture_pack_enabled + "\"), but the config option is not an enum.").c_str());
             }
             return false;
         }
 
-        const recomp::mods::ConfigOptionEnum &option_enum = std::get<recomp::mods::ConfigOptionEnum>(option.variant);
+        const recomp::config::ConfigOptionEnum &option_enum = std::get<recomp::config::ConfigOptionEnum>(option.variant);
         if (option_enum.options.size() != 2) {
             if (show_errors) {
                 recompui::message_box(("Mod has the special config option id for enabling an HD texture pack (\"" + zelda64::renderer::special_option_texture_pack_enabled + "\"), but the config option doesn't have exactly 2 values.").c_str());

@@ -40,11 +40,15 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/lib/lunasvg)
 # set(BUILD_SHARED_LIBS "${BUILD_SHARED_LIBS_SAVED}")
 SET(ENABLE_SVG_PLUGIN ON CACHE BOOL "" FORCE)
 SET(RMLUI_TESTS_ENABLED OFF CACHE BOOL "" FORCE)
+SET(RMLUI_BACKEND "Wayland_GL3" CACHE STRING  "" FORCE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/RmlUi)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/N64ModernRuntime)
 
 target_include_directories(rt64 PRIVATE ${CMAKE_BINARY_DIR}/rt64/src)
+target_compile_options(rt64 PRIVATE -Wno-error -Wno-deprecated-literal-operator)
+target_compile_options(texture_hasher PRIVATE -Wno-error)
+target_compile_options(texture_packer PRIVATE -Wno-error)
 
 # RecompiledFuncs - Library containing the primary recompiler output
 add_library(RecompiledFuncs STATIC)
@@ -147,6 +151,7 @@ add_compile_definitions(
     HLSL_CPU
     FFX_GCC
     IMGUI_IMPL_VULKAN_NO_PROTOTYPES
+    RMLUI_SDL_VERSION_MAJOR=2
 )
 
 if (CMAKE_SYSTEM_NAME MATCHES "Linux" AND RT64_SDL_WINDOW_VULKAN)
@@ -237,6 +242,7 @@ else()
     target_compile_options(Kirby64Recompiled PRIVATE
         -fno-strict-aliasing
         -fms-extensions
+        -fcolor-diagnostics
     )
 endif()
 
@@ -289,7 +295,7 @@ endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     find_package(SDL2 REQUIRED)
-    find_package(X11 REQUIRED)
+    # find_package(X11 REQUIRED)
     
     # Generate icon_bytes.c from the app icon PNG.
     add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/icon_bytes.c ${CMAKE_CURRENT_BINARY_DIR}/icon_bytes.h
@@ -303,13 +309,13 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
 
     target_include_directories(Kirby64Recompiled PRIVATE ${SDL2_INCLUDE_DIRS})
 
-    message(STATUS "X11_FOUND = ${X11_FOUND}")
-    message(STATUS "X11_Xrandr_FOUND = ${X11_Xrandr_FOUND}")
-    message(STATUS "X11_INCLUDE_DIR = ${X11_INCLUDE_DIR}")
-    message(STATUS "X11_LIBRARIES = ${X11_LIBRARIES}")
+    # message(STATUS "X11_FOUND = ${X11_FOUND}")
+    # message(STATUS "X11_Xrandr_FOUND = ${X11_Xrandr_FOUND}")
+    # message(STATUS "X11_INCLUDE_DIR = ${X11_INCLUDE_DIR}")
+    # message(STATUS "X11_LIBRARIES = ${X11_LIBRARIES}")
 
-    target_include_directories(Kirby64Recompiled PRIVATE ${X11_INCLUDE_DIR} ${X11_Xrandr_INCLUDE_PATH})
-    target_link_libraries(Kirby64Recompiled PRIVATE ${X11_LIBRARIES} ${X11_Xrandr_LIB})
+    # target_include_directories(Kirby64Recompiled PRIVATE ${X11_INCLUDE_DIR} ${X11_Xrandr_INCLUDE_PATH})
+    # target_link_libraries(Kirby64Recompiled PRIVATE ${X11_LIBRARIES} ${X11_Xrandr_LIB})
 
     find_package(Freetype REQUIRED)
 
@@ -332,8 +338,8 @@ target_link_libraries(Kirby64Recompiled PRIVATE
     RecompiledFuncs
     SDL2
     rt64
-    RmlCore
-    RmlDebugger
+    rmlui_core
+    rmlui_debugger
     nfd
     lunasvg
     ultramodern

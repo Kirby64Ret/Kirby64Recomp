@@ -184,8 +184,8 @@ public:
         launcher_menu_controller = recompui::create_launcher_menu();
         config_menu_controller = recompui::create_config_menu();
 
-        system_interface = std::make_unique<SystemInterface_SDL>();
-        system_interface->SetWindow(window);
+        system_interface = std::make_unique<SystemInterface_SDL>(window);
+        // system_interface->SetWindow(window);
         render_interface.init(interface, device);
 
         launcher_menu_controller->register_events(event_listener_instancer);
@@ -693,12 +693,12 @@ void draw_hook(RT64::RenderCommandList* command_list, RT64::RenderFramebuffer* s
             // Send the event to RmlUi if this type of event is being captured.
             if (is_mouse_input) {
                 if (context_capturing_mouse) {
-                    RmlSDL::InputEventHandler(ui_state->context, cur_event);
+                    RmlSDL::InputEventHandler(ui_state->context, window, cur_event);
                 }
             }
             else {
                 if (context_capturing_input) {
-                    RmlSDL::InputEventHandler(ui_state->context, cur_event);
+                    RmlSDL::InputEventHandler(ui_state->context, window, cur_event);
                 }
             }
         }

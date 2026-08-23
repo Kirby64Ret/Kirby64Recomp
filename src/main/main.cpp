@@ -350,6 +350,7 @@ std::vector<recomp::GameEntry> supported_games = {
         .entrypoint_address = get_entrypoint_address(),
         .entrypoint = recomp_entrypoint,
         .save_type = recomp::SaveType::Eep16k,
+        .display_name = "Kirby 64",
     },
 };
 
@@ -673,17 +674,21 @@ int main(int argc, char** argv) {
     // Register the .rtz texture pack file format with the previous content type as its only allowed content type.
     recomp::mods::register_mod_container_type("rtz", std::vector{ texture_pack_content_type_id }, false);
 
+    recomp::Configuration kirby_game_config = {
+        .project_version = project_version,
+        .window_handle = {},
+        .rsp_callbacks = rsp_callbacks,
+        .renderer_callbacks = renderer_callbacks,
+        .audio_callbacks = audio_callbacks,
+        .input_callbacks = input_callbacks,
+        .gfx_callbacks = gfx_callbacks,
+        .events_callbacks = thread_callbacks,
+        .error_handling_callbacks = error_handling_callbacks,
+        .threads_callbacks = threads_callbacks
+    };
+
     recomp::start(
-        project_version,
-        {},
-        rsp_callbacks,
-        renderer_callbacks,
-        audio_callbacks,
-        input_callbacks,
-        gfx_callbacks,
-        thread_callbacks,
-        error_handling_callbacks,
-        threads_callbacks
+        kirby_game_config
     );
 
     NFD_Quit();

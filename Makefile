@@ -2,7 +2,7 @@ default: all
 
 all: build/Kirby64Recompiled
 
-LLVM_VER := 18
+LLVM_VER := 21
 CLANG_EXE := /usr/lib/llvm$(LLVM_VER)/bin/clang
 CLANGXX_EXE := /usr/lib/llvm$(LLVM_VER)/bin/clang++
 N64RECOMP := build/N64Recomp/N64Recomp
@@ -27,7 +27,7 @@ build/:
 
 # 	$(MAKE) -C build
 build/Kirby64Recompiled: build/
-	CLICOLOR_FORCE=1 ninja $(JOB_FLAG) -C build
+	CLICOLOR_FORCE=1 ninja -j1 -C build
 
 clean:
 	rm -rf build

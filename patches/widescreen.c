@@ -2,6 +2,7 @@
 #include "GObj.h"
 #include "graphics.h"
 
+
 #include "wsextern.h"
 extern Gfx *gDisplayListHeads[];
 

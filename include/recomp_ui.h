@@ -9,6 +9,12 @@
 // TODO move this file into src/ui
 
 #include "SDL.h"
+
+// I HATE X11 I HATE X11
+#undef None
+#undef Success
+#undef Always
+
 #include "RmlUi/Core.h"
 
 #include "../src/ui/util/hsv.h"
