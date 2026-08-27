@@ -39,9 +39,6 @@ SET(LUNASVG_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/lunasvg)
 # set(BUILD_SHARED_LIBS "${BUILD_SHARED_LIBS_SAVED}")
 SET(ENABLE_SVG_PLUGIN ON CACHE BOOL "" FORCE)
-SET(RMLUI_TESTS_ENABLED OFF CACHE BOOL "" FORCE)
-SET(RMLUI_BACKEND "Wayland_GL3" CACHE STRING  "" FORCE)
-add_subdirectory(${CMAKE_SOURCE_DIR}/lib/RmlUi)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/N64ModernRuntime)
 
@@ -151,7 +148,6 @@ add_compile_definitions(
     HLSL_CPU
     FFX_GCC
     IMGUI_IMPL_VULKAN_NO_PROTOTYPES
-    RMLUI_SDL_VERSION_MAJOR=2
 )
 
 if (CMAKE_SYSTEM_NAME MATCHES "Linux" AND RT64_SDL_WINDOW_VULKAN)
@@ -207,16 +203,12 @@ set (SOURCES
     ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_text_input.cpp
     ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_toggle.cpp
     ${CMAKE_SOURCE_DIR}/rsp/n_aspMain.cpp
-
-    ${CMAKE_SOURCE_DIR}/lib/RmlUi/Backends/RmlUi_Platform_SDL.cpp
 )
 
 target_include_directories(Kirby64Recompiled PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/lib/concurrentqueue
     ${CMAKE_SOURCE_DIR}/lib/GamepadMotionHelpers
-    ${CMAKE_SOURCE_DIR}/lib/RmlUi/Include
-    ${CMAKE_SOURCE_DIR}/lib/RmlUi/Backends
     ${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib
     ${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/hlslpp/include
     ${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/dxc/inc
@@ -338,8 +330,6 @@ target_link_libraries(Kirby64Recompiled PRIVATE
     RecompiledFuncs
     SDL2
     rt64
-    rmlui_core
-    rmlui_debugger
     nfd
     lunasvg
     ultramodern
