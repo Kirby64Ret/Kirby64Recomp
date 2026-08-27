@@ -171,37 +171,37 @@ set (SOURCES
     # ${CMAKE_SOURCE_DIR}/src/game/recomp_actor_api.cpp
     # ${CMAKE_SOURCE_DIR}/src/game/recomp_data_api.cpp
 
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_renderer.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_state.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_launcher.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_renderer.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_state.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_launcher.cpp
     ${CMAKE_SOURCE_DIR}/src/ui/ui_config.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_prompt.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_config_sub_menu.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_color_hack.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_rml_hacks.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_elements.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_mod_details_panel.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_mod_installer.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_mod_menu.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_api.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_api_events.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_api_images.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/ui_utils.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/util/hsv.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/core/ui_context.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_button.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_clickable.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_container.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_element.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_image.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_label.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_radio.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_scroll_container.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_slider.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_span.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_style.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_text_input.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_toggle.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_prompt.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_config_sub_menu.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_color_hack.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_rml_hacks.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_elements.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_mod_details_panel.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_mod_installer.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_mod_menu.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_api.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_api_events.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_api_images.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/ui_utils.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/util/hsv.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/core/ui_context.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_button.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_clickable.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_container.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_element.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_image.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_label.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_radio.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_scroll_container.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_slider.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_span.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_style.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_text_input.cpp
+    # ${CMAKE_SOURCE_DIR}/src/ui/elements/ui_toggle.cpp
     ${CMAKE_SOURCE_DIR}/rsp/n_aspMain.cpp
 )
 
