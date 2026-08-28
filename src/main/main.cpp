@@ -531,6 +531,7 @@ void reorder_texture_pack(recomp::mods::ModContext&) {
 
 #define REGISTER_FUNC(name) recomp::overlays::register_base_export(#name, name)
 
+
 int main(int argc, char** argv) {
     (void)argc;
     (void)argv;
@@ -613,7 +614,7 @@ int main(int argc, char** argv) {
     REGISTER_FUNC(recomp_get_mouse_deltas);
     REGISTER_FUNC(recomp_get_inverted_axes);
     REGISTER_FUNC(recomp_get_analog_inverted_axes);
-    recompui::register_ui_exports();
+    // recompui::register_ui_exports();
     // recomputil::register_data_api_exports();
 
     zelda64::register_overlays();
@@ -650,11 +651,11 @@ int main(int argc, char** argv) {
 
     ultramodern::events::callbacks_t thread_callbacks{
         .vi_callback = recomp::update_rumble,
-        .gfx_init_callback = recompui::update_supported_options,
+        // .gfx_init_callback = recompui::update_supported_options,
     };
 
     ultramodern::error_handling::callbacks_t error_handling_callbacks{
-        .message_box = recompui::message_box,
+        // .message_box = recompui::message_box,
     };
 
     ultramodern::threads::callbacks_t threads_callbacks{
@@ -687,9 +688,29 @@ int main(int argc, char** argv) {
         .threads_callbacks = threads_callbacks
     };
 
+    std::thread t1([] {
+        for (volatile int i = 0; i < 1000000; i++);
+        bool mm_rom_valid = false;
+        recomp::RomValidationError rom_error = recomp::select_rom("baserom.us.z64", supported_games[0].game_id);
+        switch (rom_error) {
+            case recomp::RomValidationError::Good:
+                mm_rom_valid = true;
+                printf("ROM opened!\n");
+                break;
+            default:
+                printf("error lol\n");
+                break;
+        }
+        if (mm_rom_valid) {
+            recomp::start_game(supported_games[0].game_id, std::string("Main Game"));
+        }
+    });
+
     recomp::start(
         kirby_game_config
     );
+
+    t1.join();
 
     NFD_Quit();
 

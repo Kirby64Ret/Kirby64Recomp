@@ -204,7 +204,7 @@ ultramodern::renderer::GraphicsApi map_graphics_api(RT64::UserConfiguration::Gra
 
 zelda64::renderer::RT64Context::RT64Context(uint8_t* rdram, ultramodern::renderer::WindowHandle window_handle, bool debug) {
     static unsigned char dummy_rom_header[0x40];
-    recompui::set_render_hooks();
+    // recompui::set_render_hooks();
 
     // Set up the RT64 application core fields.
     RT64::Application::Core appCore{};
@@ -515,7 +515,7 @@ bool zelda64::renderer::is_texture_pack_enable_config_option(const recomp::confi
     if (option.id == zelda64::renderer::special_option_texture_pack_enabled) {
         if (option.type != recomp::config::ConfigOptionType::Enum) {
             if (show_errors) {
-                recompui::message_box(("Mod has the special config option id for enabling an HD texture pack (\"" + zelda64::renderer::special_option_texture_pack_enabled + "\"), but the config option is not an enum.").c_str());
+                // recompui::message_box(("Mod has the special config option id for enabling an HD texture pack (\"" + zelda64::renderer::special_option_texture_pack_enabled + "\"), but the config option is not an enum.").c_str());
             }
             return false;
         }
@@ -523,7 +523,7 @@ bool zelda64::renderer::is_texture_pack_enable_config_option(const recomp::confi
         const recomp::config::ConfigOptionEnum &option_enum = std::get<recomp::config::ConfigOptionEnum>(option.variant);
         if (option_enum.options.size() != 2) {
             if (show_errors) {
-                recompui::message_box(("Mod has the special config option id for enabling an HD texture pack (\"" + zelda64::renderer::special_option_texture_pack_enabled + "\"), but the config option doesn't have exactly 2 values.").c_str());
+                // recompui::message_box(("Mod has the special config option id for enabling an HD texture pack (\"" + zelda64::renderer::special_option_texture_pack_enabled + "\"), but the config option doesn't have exactly 2 values.").c_str());
             }
             return false;
         }

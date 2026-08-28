@@ -79,7 +79,7 @@ void recomp::stop_scanning_input() {
 
 void queue_if_enabled(SDL_Event* event) {
     if (!recomp::all_input_disabled()) {
-        recompui::queue_event(*event);
+        // recompui::queue_event(*event);
     }
 }
 
@@ -107,15 +107,14 @@ bool sdl_event_filter(void* userdata, SDL_Event* event) {
             SDL_KeyboardEvent* keyevent = &event->key;
 
             // Skip repeated events when not in the menu
-            if (!recompui::is_context_capturing_input() &&
-                event->key.repeat) {
+            if (event->key.repeat) {
                 break;
             }
 
             if ((keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_RETURN && (keyevent->keysym.mod & SDL_Keymod::KMOD_ALT)) ||
                 keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_F11
             ) {
-                recompui::toggle_fullscreen();
+                // recompui::toggle_fullscreen();
             }
             if (scanning_device != recomp::InputDevice::COUNT) {
                 if (keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_ESCAPE) {
@@ -161,7 +160,7 @@ bool sdl_event_filter(void* userdata, SDL_Event* event) {
         }
 
         zelda64::open_quit_game_prompt();
-        recompui::activate_mouse();
+        // recompui::activate_mouse();
         break;
     }
     case SDL_EventType::SDL_MOUSEWHEEL:
@@ -215,7 +214,7 @@ bool sdl_event_filter(void* userdata, SDL_Event* event) {
                 set_stick_return_event.user.code = axis_event->axis;
                 set_stick_return_event.user.data1 = nullptr;
                 set_stick_return_event.user.data2 = nullptr;
-                recompui::queue_event(set_stick_return_event);
+                // recompui::queue_event(set_stick_return_event);
                 
                 set_scanned_input({(uint32_t)InputType::ControllerAnalog, axis_event->axis + 1});
             }
@@ -225,7 +224,7 @@ bool sdl_event_filter(void* userdata, SDL_Event* event) {
                 set_stick_return_event.user.code = axis_event->axis;
                 set_stick_return_event.user.data1 = nullptr;
                 set_stick_return_event.user.data2 = nullptr;
-                recompui::queue_event(set_stick_return_event);
+                // recompui::queue_event(set_stick_return_event);
 
                 set_scanned_input({(uint32_t)InputType::ControllerAnalog, -axis_event->axis - 1});
             }
@@ -285,11 +284,11 @@ bool sdl_event_filter(void* userdata, SDL_Event* event) {
         SDL_free(event->drop.file);
         break;
     case SDL_EventType::SDL_DROPCOMPLETE:
-        recompui::drop_files(DropState.files_dropped);
+        // recompui::drop_files(DropState.files_dropped);
         break;
     case SDL_EventType::SDL_CONTROLLERBUTTONUP:
         // Always queue button up events to avoid missing them during binding.
-        recompui::queue_event(*event);
+        // recompui::queue_event(*event);
         break;
     default:
         queue_if_enabled(event);
@@ -320,7 +319,7 @@ void recomp::handle_events() {
 
     if (!started && ultramodern::is_game_started()) {
         started = true;
-        recompui::process_game_started();
+        // recompui::process_game_started();
     }
 }
 
@@ -734,7 +733,8 @@ void recomp::set_right_analog_suppressed(bool suppressed) {
 
 bool recomp::game_input_disabled() {
     // Disable input if any menu that blocks input is open.
-    return recompui::is_context_capturing_input();
+    // return recompui::is_context_capturing_input();
+    return false;
 }
 
 bool recomp::all_input_disabled() {
