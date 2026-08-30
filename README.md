@@ -19,18 +19,11 @@ Special thanks to Wiseguy for dealing with the runtime fixes to support this gam
 - wait
 - wait some more
 - It should create a `Kirby64Recompiled` executable in the `build` folder
-- Give it your copy of Kirby 64 and select Start Game
+- Make sure your copy of `NK4E.z64` is in the same folder as `Kirby64Recompiled`
+  - Or, if running from the terminal, the same folder as the place you're running it from
+- Launch the exe and play it
 
 ## Clang Info
-This repo was tested to build and run on clang version 18, which is now outdated on some bleeding edge distros (like Arch/Endeavour/etc). For Arch-based distros, you can still install the `clang18` package at the time of reading and this repo will just work.
+This repo was tested to build and run on clang version 21. If you have another clang version you'd like to test (on Linux), the `Makefile` in this repo has a place to set that version.
 
-In the case that other distros install clang to a different location:
-- Run `ls /usr/lib/llvm18/bin` in your terminal.
-  - If it shows a `clang` and `clang++`, then you don't have to do anything. Go back to the Instructions.
-  - If not, continue below.
-- Open the `Makefile`
-  - Note the file paths of the `CLANG_EXE` and `CLANGXX_EXE` variables. Set these to wherever clang and clang++ version 18 get installed to
-  - Usually this is embedded in the relevant package info.
-
-
-
+Expect the tested clang version to increase over time.
