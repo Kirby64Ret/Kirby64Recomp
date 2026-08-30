@@ -1,5 +1,8 @@
 #include <cstdio>
 #include <cassert>
+#include <chrono>
+#include <iostream>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 #include <array>
@@ -689,7 +692,9 @@ int main(int argc, char** argv) {
     };
 
     std::thread t1([] {
-        for (volatile int i = 0; i < 1000000; i++);
+        using namespace std::chrono_literals;
+
+        std::this_thread::sleep_for(1000ms);
         bool mm_rom_valid = false;
         recomp::RomValidationError rom_error = recomp::select_rom("baserom.us.z64", supported_games[0].game_id);
         switch (rom_error) {
@@ -704,13 +709,15 @@ int main(int argc, char** argv) {
         if (mm_rom_valid) {
             recomp::start_game(supported_games[0].game_id, std::string("Main Game"));
         }
+
+        while (1);
     });
 
     recomp::start(
         kirby_game_config
     );
 
-    t1.join();
+    // t1.join();
 
     NFD_Quit();
 
