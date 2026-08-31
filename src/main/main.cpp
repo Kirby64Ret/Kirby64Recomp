@@ -692,9 +692,6 @@ int main(int argc, char** argv) {
     };
 
     std::thread t1([] {
-        using namespace std::chrono_literals;
-
-        std::this_thread::sleep_for(500ms);
         bool mm_rom_valid = false;
         recomp::RomValidationError rom_error = recomp::select_rom("NK4E.z64", supported_games[0].game_id);
         switch (rom_error) {
