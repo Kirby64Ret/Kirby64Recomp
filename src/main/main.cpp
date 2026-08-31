@@ -693,6 +693,9 @@ int main(int argc, char** argv) {
 
     std::thread t1([] {
         bool mm_rom_valid = false;
+
+        ultramodern::set_native_thread_name("ROM selection thread");
+
         recomp::RomValidationError rom_error = recomp::select_rom("NK4E.z64", supported_games[0].game_id);
         switch (rom_error) {
             case recomp::RomValidationError::Good:
