@@ -3,7 +3,7 @@ TARGET = patches.elf
 CC      ?= clang
 LD      ?= ld.lld
 
-DECOMP := ~/Decomps/kirby64
+DECOMP := ../lib/kirby64
 LIBULTRA_INC := $(DECOMP)/libreultra/include/2.0I
 DECOMP_INCS := -I $(LIBULTRA_INC) -I $(LIBULTRA_INC)/PR -I $(DECOMP)/include -I $(DECOMP)/include/libc -I $(DECOMP)/src -I $(DECOMP)/src.old -I $(DECOMP)/assets -I../lib/rt64/include
 
