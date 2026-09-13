@@ -16,18 +16,15 @@
 #undef Always
 
 // #include "RmlUi/Core.h"
-
-#include "../src/ui/util/hsv.h"
-#include "../src/ui/util/bem.h"
+// 
+// #include "../src/ui/util/hsv.h"
+// #include "../src/ui/util/bem.h"
 
 #include "../src/ui/core/ui_context.h"
 
-// namespace Rml {
-//     class ElementDocument;
-//     class EventListenerInstancer;
-//     class Context;
-//     class Event;
-// }
+namespace Rml {
+    class Event;
+}
 
 namespace recompui {
     class UiEventListenerInstancer;
@@ -38,7 +35,7 @@ namespace recompui {
         virtual ~MenuController() {}
         virtual void load_document() = 0;
         virtual void register_events(UiEventListenerInstancer& listener) = 0;
-        virtual void make_bindings(Rml::Context* context) = 0;
+        // virtual void make_bindings(Rml::Context* context) = 0;
     };
 
     std::unique_ptr<MenuController> create_launcher_menu();
@@ -76,8 +73,8 @@ namespace recompui {
 
     void set_config_tab(ConfigTab tab);
     int config_tab_to_index(ConfigTab tab);
-    Rml::ElementTabSet* get_config_tabset();
-    Rml::Element* get_mod_tab();
+    // Rml::ElementTabSet* get_config_tabset();
+    // Rml::Element* get_mod_tab();
     void set_config_tabset_mod_nav();
     void focus_mod_configure_button();
 

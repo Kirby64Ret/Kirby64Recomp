@@ -12,7 +12,7 @@
 #include "ultramodern/config.hpp"
 
 #include "zelda_render.h"
-#include "recomp_ui.h"
+// #include "recomp_ui.h"
 #include "concurrentqueue.h"
 
 static RT64::UserConfiguration::Antialiasing device_max_msaa = RT64::UserConfiguration::Antialiasing::None;

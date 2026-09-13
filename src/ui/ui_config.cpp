@@ -48,52 +48,52 @@ int recompui::config_tab_to_index(recompui::ConfigTab tab) {
     }
 }
 
-template <typename T>
-void get_option(const T& input, Rml::Variant& output) {
-    std::string value = "";
-    to_json(value, input);
+// template <typename T>
+// void get_option(const T& input, Rml::Variant& output) {
+//     std::string value = "";
+//     to_json(value, input);
 
-    if (value.empty()) {
-        throw std::runtime_error("Invalid value :" + std::to_string(int(input)));
-    }
+//     if (value.empty()) {
+//         throw std::runtime_error("Invalid value :" + std::to_string(int(input)));
+//     }
 
-    output = value;
-}
+//     output = value;
+// }
 
-template <typename T>
-void set_option(T& output, const Rml::Variant& input) {
-    T value = T::OptionCount;
-    from_json(input.Get<std::string>(), value);
+// template <typename T>
+// void set_option(T& output, const Rml::Variant& input) {
+//     T value = T::OptionCount;
+//     from_json(input.Get<std::string>(), value);
 
-    if (value == T::OptionCount) {
-        throw std::runtime_error("Invalid value :" + input.Get<std::string>());
-    }
+//     if (value == T::OptionCount) {
+//         throw std::runtime_error("Invalid value :" + input.Get<std::string>());
+//     }
 
-    output = value;
-}
+//     output = value;
+// }
 
-template <typename T>
-void bind_option(Rml::DataModelConstructor& constructor, const std::string& name, T* option) {
-    constructor.BindFunc(name,
-        [option](Rml::Variant& out) { get_option(*option, out); },
-        [option](const Rml::Variant& in) {
-            set_option(*option, in);
-        }
-    );
-};
+// template <typename T>
+// void bind_option(Rml::DataModelConstructor& constructor, const std::string& name, T* option) {
+//     constructor.BindFunc(name,
+//         [option](Rml::Variant& out) { get_option(*option, out); },
+//         [option](const Rml::Variant& in) {
+//             set_option(*option, in);
+//         }
+//     );
+// };
 
-template <typename T>
-void bind_atomic(Rml::DataModelConstructor& constructor, Rml::DataModelHandle handle, const char* name, std::atomic<T>* atomic_val) {
-    constructor.BindFunc(name,
-        [atomic_val](Rml::Variant& out) {
-            out = atomic_val->load();
-        },
-        [atomic_val, handle, name](const Rml::Variant& in) mutable {
-            atomic_val->store(in.Get<T>());
-            handle.DirtyVariable(name);
-        }
-    );
-}
+// template <typename T>
+// void bind_atomic(Rml::DataModelConstructor& constructor, Rml::DataModelHandle handle, const char* name, std::atomic<T>* atomic_val) {
+//     constructor.BindFunc(name,
+//         [atomic_val](Rml::Variant& out) {
+//             out = atomic_val->load();
+//         },
+//         [atomic_val, handle, name](const Rml::Variant& in) mutable {
+//             atomic_val->store(in.Get<T>());
+//             handle.DirtyVariable(name);
+//         }
+//     );
+// }
 
 static int scanned_binding_index = -1;
 static int scanned_input_index = -1;
