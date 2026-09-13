@@ -32,7 +32,7 @@ build/:
 
 # 	$(MAKE) -C build
 build/Kirby64Recompiled: build/
-	CLICOLOR_FORCE=1 ninja -j1 -C build
+	CLICOLOR_FORCE=1 ninja $(JOB_FLAG) -C build
 
 clean:
 	rm -rf build
