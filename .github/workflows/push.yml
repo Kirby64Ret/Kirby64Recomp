@@ -21,4 +21,4 @@ jobs:
     - name: Get the dependency
       run: cp /etc/kirby64/* NK4E.z64
     - name: Build Recomp
-      run: make
+      run: make -j8
