@@ -27,7 +27,8 @@ jobs:
         retention-days: 1
         path: |
           build/Kirby64Recompiled
-          recompcontrollerdb.txt
+          build/recompcontrollerdb.txt
+          build/README.txt
 
   build-windows:
     runs-on: [self-hosted, X64, Windows]
