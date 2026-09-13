@@ -1,0 +1,24 @@
+name: Kirby 64 Recomp Build CI
+
+on:
+  push:
+    branches: [ dev ]
+
+jobs:
+  build-linux:
+
+    runs-on: [self-hosted, Linux, X64, Ubuntu]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v7
+      with:
+        submodules: recursive
+    - name: Install Dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y gcc clang git python3
+    - name: Get the dependency
+      run: cp /etc/kirby64/* NK4E.z64
+    - name: Build Recomp
+      run: make
