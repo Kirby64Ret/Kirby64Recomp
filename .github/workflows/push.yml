@@ -20,6 +20,15 @@ jobs:
       run: cp /etc/kirby64/* NK4E.z64
     - name: Build Recomp
       run: make -j8
+    - name: Upload
+      uses: actions/upload-artifact@v7
+      with:
+        name: Kirby 64 Recompiled (Ubuntu 26.04)
+        retention-days: 1
+        path: |
+          build/Kirby64Recompiled
+          recompcontrollerdb.txt
+
   build-windows:
     runs-on: [self-hosted, X64, Windows]
     steps:
