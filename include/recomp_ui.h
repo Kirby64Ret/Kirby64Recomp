@@ -15,11 +15,6 @@
 #undef Success
 #undef Always
 
-// #include "RmlUi/Core.h"
-// 
-// #include "../src/ui/util/hsv.h"
-// #include "../src/ui/util/bem.h"
-
 #include "../src/ui/core/ui_context.h"
 
 namespace Rml {

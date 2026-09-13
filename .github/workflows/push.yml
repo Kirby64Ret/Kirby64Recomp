@@ -6,9 +6,7 @@ on:
 
 jobs:
   build-linux:
-
     runs-on: [self-hosted, Linux, X64, Ubuntu]
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
@@ -18,6 +16,17 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y gcc clang git python3
+    - name: Get the dependency
+      run: cp /etc/kirby64/* NK4E.z64
+    - name: Build Recomp
+      run: make -j8
+  build-windows:
+    runs-on: [self-hosted, X64, Windows]
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v7
+      with:
+        submodules: recursive
     - name: Get the dependency
       run: cp /etc/kirby64/* NK4E.z64
     - name: Build Recomp
