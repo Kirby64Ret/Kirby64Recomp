@@ -2,9 +2,9 @@ default: all
 
 all: build/Kirby64Recompiled
 
-LINUX_NAME := $(shell grep '\bID=' /etc/os-release | tr '=' ' ' | awk '{print $2}')
+LINUX_NAME := $(shell . /etc/os-release && echo $$ID)
 ifeq ($(LINUX_NAME),ubuntu)
-	IS_UBUNTU := -
+	IS_UBUNTU = -
 endif
 
 LLVM_VER := 21
