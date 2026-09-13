@@ -2,9 +2,14 @@ default: all
 
 all: build/Kirby64Recompiled
 
+LINUX_NAME := $(shell grep '\bID=' /etc/os-release | tr '=' ' ' | awk '{print $2}')
+ifeq ($(LINUX_NAME),ubuntu)
+	IS_UBUNTU := -
+endif
+
 LLVM_VER := 21
-CLANG_EXE := /usr/lib/llvm$(LLVM_VER)/bin/clang
-CLANGXX_EXE := /usr/lib/llvm$(LLVM_VER)/bin/clang++
+CLANG_EXE := /usr/lib/llvm$(IS_UBUNTU)$(LLVM_VER)/bin/clang
+CLANGXX_EXE := /usr/lib/llvm$(IS_UBUNTU)$(LLVM_VER)/bin/clang++
 N64RECOMP := build/N64Recomp/N64Recomp
 RSPRECOMP := build/N64Recomp/RSPRecomp
 JOB_FLAG := $(filter -j%, $(subst -j ,-j,$(MAKEFLAGS)))
