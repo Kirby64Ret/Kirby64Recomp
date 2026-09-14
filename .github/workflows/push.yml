@@ -38,6 +38,13 @@ jobs:
       with:
         submodules: recursive
     - name: Get the dependency
-      run: cp /etc/kirby64/* NK4E.z64
+      run: cp C:\NK4E.z64 .
     - name: Build Recomp
-      run: make -j8
+      run: |
+        mkdir build/N64Recomp
+        cmake -B build\N64Recomp -S N64Recomp -G Ninja
+        ninja -C build\N64Recomp -j8
+        .\build\N64Recomp\N64Recomp NK4E.toml
+        .\build\N64Recomp\RSPRecomp n_aspMain.toml
+        cmake -B build -S . -G Ninja
+        ninja -j8 -C build
