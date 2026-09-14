@@ -23,12 +23,12 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v7
       with:
-        name: Kirby 64 Recompiled (Ubuntu 26.04)
+        name: Kirby 64 Recompiled Launcher (Ubuntu 26.04)
         retention-days: 1
         path: |
           build/Kirby64Recompiled
-          build/recompcontrollerdb.txt
-          build/README.txt
+          recompcontrollerdb.txt
+          assets/README.txt
 
   build-windows:
     runs-on: [self-hosted, X64, Windows]
@@ -48,3 +48,12 @@ jobs:
         .\build\N64Recomp\RSPRecomp n_aspMain.toml
         cmake -B build -S . -G Ninja
         ninja -j8 -C build
+    - name: Upload
+      uses: actions/upload-artifact@v7
+      with:
+        name: Kirby 64 Recompiled Launcher (Windows 11)
+        retention-days: 1
+        path: |
+          build/Kirby64Recompiled.exe
+          recompcontrollerdb.txt
+          assets/README.txt
