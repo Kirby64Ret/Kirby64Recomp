@@ -65,8 +65,7 @@ jobs:
         run: |
           # enable ccache
           set $env:PATH="$env:USERPROFILE/.cargo/bin;$env:PATH"
-          # $cpuCores = (Get-CimInstance -ClassName Win32_Processor).NumberOfLogicalProcessors
-          $cpuCores = 1
+          $cpuCores = (Get-CimInstance -ClassName Win32_Processor).NumberOfLogicalProcessors
 
           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_MAKE_PROGRAM=ninja -G Ninja -S N64Recomp/ -B build/N64Recomp
           cmake --build build/N64Recomp --config Release --target N64RecompCLI -j $cpuCores
@@ -83,8 +82,7 @@ jobs:
         run: |-
           # enable ccache
           set $env:PATH="$env:USERPROFILE/.cargo/bin;$env:PATH"
-          # $cpuCores = (Get-CimInstance -ClassName Win32_Processor).NumberOfLogicalProcessors
-          $cpuCores = 1
+          $cpuCores = (Get-CimInstance -ClassName Win32_Processor).NumberOfLogicalProcessors
 
           # remove LLVM from PATH so it doesn't overshadow the one provided by VS
           $env:PATH = ($env:PATH -split ';' | Where-Object { $_ -ne 'C:\Program Files\LLVM\bin' }) -join ';'

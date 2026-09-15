@@ -44,6 +44,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/lib/N64ModernRuntime)
 
 target_include_directories(rt64 PRIVATE ${CMAKE_BINARY_DIR}/rt64/src)
 target_compile_options(rt64 PRIVATE -Wno-error -Wno-deprecated-literal-operator)
+target_compile_options(rt64 PRIVATE -U__PRFCHW__)
 target_compile_options(texture_hasher PRIVATE -Wno-error)
 target_compile_options(texture_packer PRIVATE -Wno-error)
 
