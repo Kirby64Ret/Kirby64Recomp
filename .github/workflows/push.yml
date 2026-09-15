@@ -93,11 +93,11 @@ jobs:
           SDL2_VERSION: 2.30.3
       - name: Prepare Archive
         run: |
-          Move-Item -Path "cmake-build/Kirby64Recompiled.exe" -Destination "Kirby64Recompiled.exe"
-          Move-Item -Path "cmake-build/dxcompiler.dll" -Destination "dxcompiler.dll"
-          Move-Item -Path "cmake-build/dxil.dll" -Destination "dxil.dll"
-          Move-Item -Path "cmake-build/SDL2.dll" -Destination "SDL2.dll"
-          Move-Item -Path "cmake-build/Kirby64Recompiled.pdb" -Destination "Kirby64Recompiled.pdb"
+          Move-Item -Path "build/Kirby64Recompiled.exe" -Destination "Kirby64Recompiled.exe"
+          Move-Item -Path "build/dxcompiler.dll" -Destination "dxcompiler.dll"
+          Move-Item -Path "build/dxil.dll" -Destination "dxil.dll"
+          Move-Item -Path "build/SDL2.dll" -Destination "SDL2.dll"
+          Move-Item -Path "build/Kirby64Recompiled.pdb" -Destination "Kirby64Recompiled.pdb"
           Remove-Item -Path "assets/scss" -Recurse -Force
       - name: Upload Kirby64 Recomp Launcher
         uses: actions/upload-artifact@v7
