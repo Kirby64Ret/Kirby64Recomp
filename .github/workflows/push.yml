@@ -42,15 +42,10 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
           submodules: recursive
-      - name: ccache-debug
+      - name: Add select dependencies to path
         run: |
           echo "C:\Program Files\Git\bin" >> $env:GITHUB_PATH
-
-      - name: Verify sh
-        run: |
-          where.exe sh
-          node -e "require('child_process').execFile('sh', ['--version'], (e, o, s) => { console.log(e || o || s) })"
-
+          echo "C:\Program Files\7-Zip" >> $env:GITHUB_PATH
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.24
         with:
