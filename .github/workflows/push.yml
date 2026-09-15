@@ -34,7 +34,7 @@ jobs:
     runs-on: [self-hosted, X64, Windows]
     strategy:
       matrix:
-        type: [ RelWithDebInfo ]
+        type: [ RelWithDebInfo, Release ]
     name: windows (${{ matrix.type }})
     steps:
       - name: Checkout
