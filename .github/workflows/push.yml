@@ -43,12 +43,10 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
           submodules: recursive
       - name: ccache-debug
-        shell: pwsh
         run: |
           echo "C:\Program Files\Git\bin" >> $env:GITHUB_PATH
 
       - name: Verify sh
-        shell: pwsh
         run: |
           where.exe sh
           node -e "require('child_process').execFile('sh', ['--version'], (e, o, s) => { console.log(e || o || s) })"
