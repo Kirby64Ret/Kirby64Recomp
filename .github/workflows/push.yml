@@ -54,7 +54,7 @@ jobs:
         run: |
           $ProgressPreference = 'SilentlyContinue'
           New-Item -ItemType Directory -Path portable-llvm > $null
-          7z x C:\LLVM.tar.xz -oLLVM.tar
+          7z x C:\LLVM.tar.xz -o'.\LLVM.tar'
           7z x LLVM.tar -oportable-llvm
       - name: Configure Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1
