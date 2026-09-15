@@ -43,7 +43,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
           submodules: recursive
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2
+        uses: hendrikmuhs/ccache-action@v1.2.24
         with:
           key: ${{ runner.os }}-kirby64ret-ccache-${{ matrix.type }}
       - name: Download portable LLVM
@@ -74,7 +74,7 @@ jobs:
         run: |
           ./N64Recomp.exe NK4E.toml
           ./RSPRecomp.exe n_aspMain.toml
-      - name: Build ZeldaRecomp
+      - name: Build Kirby 64 Recomp Launcher
         run: |-
           # enable ccache
           set $env:PATH="$env:USERPROFILE/.cargo/bin;$env:PATH"
@@ -95,7 +95,7 @@ jobs:
           Move-Item -Path "cmake-build/SDL2.dll" -Destination "SDL2.dll"
           Move-Item -Path "cmake-build/Kirby64Recompiled.pdb" -Destination "Kirby64Recompiled.pdb"
           Remove-Item -Path "assets/scss" -Recurse -Force
-      - name: Archive Zelda64Recomp
+      - name: Upload Kirby64 Recomp Launcher
         uses: actions/upload-artifact@v7
         with:
           retention-days: 1
