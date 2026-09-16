@@ -34,7 +34,7 @@ jobs:
     runs-on: [self-hosted, X64, Windows]
     strategy:
       matrix:
-        type: [ RelWithDebInfo, Release ]
+        type: [ RelWithDebInfo, Release, Debug ]
     name: windows (${{ matrix.type }})
     steps:
       - name: Checkout
@@ -93,17 +93,17 @@ jobs:
           SDL2_VERSION: 2.30.3
       - name: Prepare Archive
         run: |
-          Move-Item -Path "build/Kirby64Recompiled.exe" -Destination "Kirby64Recompiled.exe"
-          Move-Item -Path "build/dxcompiler.dll" -Destination "dxcompiler.dll"
-          Move-Item -Path "build/dxil.dll" -Destination "dxil.dll"
-          Move-Item -Path "build/SDL2.dll" -Destination "SDL2.dll"
-          Move-Item -Path "build/Kirby64Recompiled.pdb" -Destination "Kirby64Recompiled.pdb"
+          Copy-Item -Path "build/Kirby64Recompiled.exe" -Destination "Kirby64Recompiled.exe"
+          Copy-Item -Path "build/dxcompiler.dll" -Destination "dxcompiler.dll"
+          Copy-Item -Path "build/dxil.dll" -Destination "dxil.dll"
+          Copy-Item -Path "build/SDL2.dll" -Destination "SDL2.dll"
+          Copy-Item -Path "build/Kirby64Recompiled.pdb" -Destination "Kirby64Recompiled.pdb"
           Remove-Item -Path "assets/scss" -Recurse -Force
       - name: Upload Kirby64 Recomp Launcher
         uses: actions/upload-artifact@v7
         with:
           retention-days: 1
-          name: Kirby64Recompiled-${{ runner.os }}-${{ matrix.type }}
+          name: Kirby 64 Recomp Launcher (${{ runner.os }}) (${{ matrix.type }})
           path: |
             Kirby64Recompiled.exe
             dxcompiler.dll
@@ -115,6 +115,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           retention-days: 1
-          name: Kirby64Recompiled-PDB-${{ matrix.type }}
+          name: Kirby 64 Recomp Debug Symbols (${{ matrix.type }})
           path: |
             Kirby64Recompiled.pdb
