@@ -5,7 +5,7 @@
 
 #include "slot_map.h"
 #include "recomp_data.h"
-#include "recomp_ui.h"
+//#include "recomp_ui.h"
 #include "librecomp/helpers.hpp"
 #include "librecomp/overlays.hpp"
 #include "librecomp/addresses.hpp"
@@ -174,7 +174,8 @@ LockedSlotmap<MemorySlotmap> memory_slotmaps{};
 
 static void show_fatal_error_message_box(const char* funcname, const char* errstr) {
     std::string message = std::string{"Fatal error in mod - "} + funcname + " : " + errstr;
-    recompui::message_box(message.c_str());
+    //recompui::message_box(message.c_str());
+    printf("[ERROR] %s\n", message.c_str());
 }
 
 #define HANDLE_INVALID_ERROR() \
