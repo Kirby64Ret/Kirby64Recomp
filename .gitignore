@@ -59,7 +59,7 @@ vcpkg_installed/
 # Runtime files
 imgui.ini
 rt64.log
-*.txt
+gamecontrollerdb.txt
 node_modules/
 
 # Recompiler Linux binary

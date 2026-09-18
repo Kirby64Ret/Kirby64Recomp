@@ -349,6 +349,7 @@ std::vector<recomp::GameEntry> supported_games = {
         .rom_hash = 0xD992BD1EBD3F8756ULL,
         .internal_name = "Kirby64            ",
         .game_id = u8"NK4E.us",
+        .mod_game_id = "kirby64",
         .is_enabled = true,
         .entrypoint_address = get_entrypoint_address(),
         .entrypoint = recomp_entrypoint,
@@ -618,7 +619,7 @@ int main(int argc, char** argv) {
     REGISTER_FUNC(recomp_get_inverted_axes);
     REGISTER_FUNC(recomp_get_analog_inverted_axes);
     // recompui::register_ui_exports();
-    // recomputil::register_data_api_exports();
+    recomputil::register_data_api_exports();
 
     zelda64::register_overlays();
     zelda64::register_patches();
